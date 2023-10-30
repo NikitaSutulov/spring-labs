@@ -10,6 +10,7 @@ import java.util.List;
 public class WordService {
     private final WordRepository wordRepository;
 
+    //constructor
     public WordService(WordRepository wordRepository) {
         this.wordRepository = wordRepository;
     }

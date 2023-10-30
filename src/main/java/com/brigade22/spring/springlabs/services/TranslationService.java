@@ -11,12 +11,10 @@ import java.util.List;
 @Service
 public class TranslationService {
 
-    private final TranslationRepository translationRepository;
-
+    // field injection
     @Autowired
-    public TranslationService(TranslationRepository translationRepository) {
-        this.translationRepository = translationRepository;
-    }
+    private TranslationRepository translationRepository;
+
     public void saveTranslation (Translation translation) {
         translationRepository.save(translation);
     }
