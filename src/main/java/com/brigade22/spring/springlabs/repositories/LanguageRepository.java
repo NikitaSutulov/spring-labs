@@ -23,4 +23,17 @@ public class LanguageRepository {
     public void delete(String code) {
         this.languages.removeIf((l) -> l.getCode().equals(code));
     }
+
+    public void deleteByCode(String code) {
+        languages.removeIf(language -> language.getCode().equals(code));
+    }
+
+    public Language findByCode(String code) {
+        for (Language language : languages) {
+            if (language.getCode().equals(code)) {
+                return language; // Return the language if the code matches
+            }
+        }
+        return null; // Return null if no matching language is found
+    }
 }
