@@ -39,7 +39,7 @@
         <tr th:each="dictionary : ${dictionaries}">
             <td th:text="${dictionary.name}"></td>
             <td th:if="${user == 'admin'}">
-                <a th:href="@{'/dictionaries/edit-dictionary/' + ${dictionary.name}}" class="btn btn-primary">Edit</a>
+                <a th:href="@{'/dictionaries/' + ${dictionary.name} + '/edit'}" class="btn btn-primary">Edit</a>
             </td>
             <td th:if="${user == 'admin'}">
                 <form th:action="@{'/dictionaries/' + ${dictionary.name}}" method="post">

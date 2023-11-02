@@ -48,6 +48,20 @@ public class DictionaryController {
         }
     }
 
+    @GetMapping("dictionaries/{dictionaryName}/edit")
+    public String editDictionary(@PathVariable String dictionaryName, Model model) {
+        Dictionary dictionary = dictionaryService.getDictionaryByName(dictionaryName);
+        model.addAttribute("dictionary", dictionary);
+        return "edit-dictionary";
+    }
+
+    @PostMapping("dictionaries/{dictionaryName}/edit")
+    public String editDictionary(@PathVariable String dictionaryName, @RequestParam("name") String updatedName) {
+        Dictionary dictionary = dictionaryService.getDictionaryByName(dictionaryName);
+        dictionary.setName(updatedName);
+        return "redirect:/dictionaries?user=admin";
+    }
+
     @GetMapping("/dictionaries/{dictionaryName}/edit/{word}-{translatedWord}")
     public String editTranslation(
             @PathVariable String dictionaryName,
