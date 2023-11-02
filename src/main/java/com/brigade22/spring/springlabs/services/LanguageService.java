@@ -44,7 +44,7 @@ public class LanguageService {
     public void initializeSampleData() {
         Language language1 = new Language("en", "English");
         Language language2 = new Language("ua", "Ukrainian");
-        Language language3 = new Language("ru", "Russian");
+        Language language3 = new Language("pl", "Polish");
 
         languageRepository.save(language1);
         languageRepository.save(language2);

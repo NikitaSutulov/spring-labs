@@ -23,4 +23,13 @@ public class DictionaryRepository {
     public void delete(String name) {
         this.dictionaries.removeIf((d) -> d.getName().equals(name));
     }
+
+    public Dictionary findByName(String name) {
+        for (Dictionary dictionary : dictionaries) {
+            if (dictionary.getName().equals(name)) {
+                return dictionary; // Return the dictionary if the name matches
+            }
+        }
+        return null; // Return null if no matching dictionary is found
+    }
 }

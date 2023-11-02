@@ -75,7 +75,7 @@ public class LanguageController {
         return "redirect:/languages?user=admin";
     }
 
-    @DeleteMapping("/languages/delete-language/{code}")
+    @DeleteMapping("/languages/{code}")
     public String deleteLanguage(@PathVariable String code) {
         languageService.deleteByCode(code);
         return "redirect:/languages?user=admin";
