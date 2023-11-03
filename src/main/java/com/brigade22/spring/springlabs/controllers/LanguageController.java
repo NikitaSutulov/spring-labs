@@ -23,21 +23,20 @@ public class LanguageController {
     public String listLanguages(Model model, @RequestParam(name = "user", required = false) String user) {
         List<Language> languages = languageService.getAll();
         model.addAttribute("languages", languages);
-        model.addAttribute("user", user); // Pass the user role to the template
-        return "languages"; // This maps to the Thymeleaf template
+        model.addAttribute("user", user);
+        return "languages";
     }
 
-    // Add controller methods for other language-related actions
-    @GetMapping("/languages/create-language") // Adjust the mapping
+    @GetMapping("/languages/create-language")
     public String createLanguageForm(Model model) {
-        model.addAttribute("language", new Language(null, null)); // Pass an empty language object to the template
+        model.addAttribute("language", new Language(null, null));
         return "create-language";
     }
 
-    @PostMapping("/languages/create-language") // Adjust the mapping
+    @PostMapping("/languages/create-language")
     public String createLanguage(@ModelAttribute Language language) {
         if (language.getCode() == null || language.getName() == null) {
-            return "redirect:/languages?user=admin"; // Redirect to the main languages page
+            return "redirect:/languages?user=admin";
         }
 
         language.setCode(language.getCode().toLowerCase());
@@ -59,12 +58,10 @@ public class LanguageController {
 
     @PostMapping("/languages/edit-language/{code}")
     public String editLanguageSubmit(@PathVariable String code, @ModelAttribute Language language) {
-        // Retrieve the existing language
         Language existingLanguage = languageService.findByCode(code);
         language.setCode(language.getCode().toLowerCase());
 
         if (existingLanguage != null) {
-            // Update the language properties from the form data
             if (languageService.findByCode(language.getCode()) == null) {
                 existingLanguage.setCode(language.getCode());
             }

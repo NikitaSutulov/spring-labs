@@ -27,24 +27,21 @@ public class DictionaryController {
     public String listLanguages(Model model, @RequestParam(name = "user", required = false) String user) {
         List<Dictionary> dictionaries = dictionaryService.getAll();
         model.addAttribute("dictionaries", dictionaries);
-        model.addAttribute("user", user); // Pass the user role to the template
-        return "dictionaries"; // This maps to the Thymeleaf template
+        model.addAttribute("user", user);
+        return "dictionaries";
     }
 
     @GetMapping("/dictionaries/{name}")
     public String openDictionary(@PathVariable String name, Model model, @RequestParam(name = "user", required = false) String user) {
-        // Here, you should retrieve the dictionary by name from your data source
-        // For the sake of example, we assume you have a "Dictionary" class with "name" and "translations" properties.
 
         Dictionary dictionary = dictionaryService.getDictionaryByName(name);
 
         if (dictionary != null) {
             model.addAttribute("dictionary", dictionary);
-            model.addAttribute("user", user); // Pass the user role to the template
-            return "dictionary"; // This maps to the Thymeleaf template "dictionary.html"
+            model.addAttribute("user", user);
+            return "dictionary";
         } else {
-            // Handle dictionary not found, redirect to an error page or display a message
-            return "error"; // You can create an error Thymeleaf template
+            return "error";
         }
     }
 
@@ -103,7 +100,7 @@ public class DictionaryController {
     @GetMapping("/dictionaries/create-dictionary")
     public String showCreateDictionaryForm(Model model) {
         model.addAttribute("dictionary", new Dictionary(null));
-        return "create-dictionary"; // This should match the name of your Thymeleaf template file.
+        return "create-dictionary";
     }
 
     @PostMapping("/dictionaries/create-dictionary")
@@ -111,7 +108,7 @@ public class DictionaryController {
         if (dictionary.getName() != null) {
             dictionaryService.saveDictionary(dictionary);
         }
-        return "redirect:/dictionaries"; // Redirect to a different page after dictionary creation.
+        return "redirect:/dictionaries";
     }
 
     @DeleteMapping("/dictionaries/{name}")
@@ -124,7 +121,7 @@ public class DictionaryController {
     public String showCreateTranslationForm(@PathVariable String dictionaryName, Model model) {
         model.addAttribute("dictionaryName", dictionaryName);
         model.addAttribute("translation", new Translation(dictionaryService.getDictionaryByName(dictionaryName), null, null));
-        return "create-translation"; // This should match the name of your Thymeleaf template file.
+        return "create-translation";
     }
 
     @PostMapping("/dictionaries/{dictionaryName}/create-translation")
@@ -139,7 +136,7 @@ public class DictionaryController {
 //            dictionary.addTranslation(translation);
 //            dictionaryService.saveDictionary(dictionary);
 //        }
-        return "redirect:/dictionaries/" + dictionaryName + "?user=admin"; // Redirect to a different page after dictionary creation.
+        return "redirect:/dictionaries/" + dictionaryName + "?user=admin";
     }
 
     @GetMapping("/dictionaries/{dictionaryName}/search")
