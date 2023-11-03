@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dictionaries</title>
+    <style>
+        .custom-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .custom-table th, .custom-table td {
+            border: 1px solid #ccc;
+            padding: 5px;
+            text-align: center;
+        }
+        .table-container {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<h1>Dictionaries List</h1>
+
+<div class="table-container">
+    <div th:if="${user == 'admin'}">
+        <a th:href="@{'/dictionaries/create-dictionary'}" class="btn btn-primary btn-space">Create New Dictionary</a>
+    </div>
+
+    <table class="custom-table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th th:if="${user == 'admin'}">Edit</th>
+            <th th:if="${user == 'admin'}">Delete</th>
+            <th>Open</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="dictionary : ${dictionaries}">
+            <td th:text="${dictionary.name}"></td>
+            <td th:if="${user == 'admin'}">
+                <a th:href="@{'/dictionaries/' + ${dictionary.name} + '/edit'}" class="btn btn-primary">Edit</a>
+            </td>
+            <td th:if="${user == 'admin'}">
+                <form th:action="@{'/dictionaries/' + ${dictionary.name}}" method="post">
+                    <input type="hidden" name="_method" value="DELETE" />
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+            <td>
+                <a th:href="@{'/dictionaries/' + ${dictionary.name}}" class="btn btn-success">Open</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -22,4 +22,8 @@ public class Dictionary {
     public List<Translation> getTranslations() {
         return translations;
     }
+
+    public void addTranslation(Translation translation) {
+        this.translations.add(translation);
+    }
 }

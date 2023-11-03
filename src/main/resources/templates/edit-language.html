@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Language</title>
+</head>
+<body>
+<h1>Edit Language</h1>
+
+<form th:action="@{'/languages/edit-language/' + ${language.code}}" th:object="${language}" method="post">
+<!--    <input type="hidden" id="code" name="code" th:field="*{code}" />-->
+
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" th:field="*{name}" />
+
+    <label for="code">Code:</label>
+    <input type="text" id="code" name="code" th:field="*{code}" />
+
+    <input type="submit" value="Save" />
+</form>
+</body>
+</html>

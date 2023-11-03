@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Languages</title>
+    <style>
+        .custom-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .custom-table th, .custom-table td {
+            border: 1px solid #ccc;
+            padding: 5px;
+            text-align: center; /* Center align text within cells */
+        }
+        .table-container {
+            margin-top: 20px; /* Add spacing at the top */
+            margin-bottom: 20px; /* Add spacing at the bottom */
+        }
+    </style>
+</head>
+<body>
+<h1>Languages List</h1>
+
+<!-- Add spacing at the top and bottom of the table -->
+<div class="table-container">
+    <!-- Add spacing between the "Create New Language" button -->
+    <div th:if="${user == 'admin'}">
+        <a th:href="@{'/languages/create-language'}" class="btn btn-primary btn-space">Create New Language</a>
+    </div>
+
+    <!-- Display the list of languages -->
+    <table class="custom-table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Code</th>
+            <th th:if="${user == 'admin'}">Edit</th>
+            <th th:if="${user == 'admin'}">Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="language : ${languages}">
+            <td th:text="${language.name}"></td>
+            <td th:text="${language.code}"></td>
+            <!-- Conditionally render buttons for admin -->
+            <td th:if="${user == 'admin'}">
+                <a th:href="@{'/languages/edit-language/' + ${language.code}}" class="btn btn-primary">Edit</a>
+            </td>
+            <td th:if="${user == 'admin'}">
+                <form th:action="@{'/languages/' + ${language.code}}" method="post">
+                    <input type="hidden" name="_method" value="DELETE" />
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
