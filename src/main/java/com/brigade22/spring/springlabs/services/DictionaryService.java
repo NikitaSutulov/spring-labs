@@ -6,7 +6,6 @@ import com.brigade22.spring.springlabs.entities.Translation;
 import com.brigade22.spring.springlabs.entities.Word;
 import com.brigade22.spring.springlabs.repositories.DictionaryRepository;
 import jakarta.annotation.PostConstruct;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

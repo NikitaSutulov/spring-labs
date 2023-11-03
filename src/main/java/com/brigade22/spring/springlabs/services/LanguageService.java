@@ -1,11 +1,9 @@
 package com.brigade22.spring.springlabs.services;
 
 import com.brigade22.spring.springlabs.entities.Language;
-import com.brigade22.spring.springlabs.entities.Word;
 import com.brigade22.spring.springlabs.repositories.LanguageRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
