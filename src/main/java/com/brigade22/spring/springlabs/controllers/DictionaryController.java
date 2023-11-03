@@ -141,4 +141,28 @@ public class DictionaryController {
 //        }
         return "redirect:/dictionaries/" + dictionaryName + "?user=admin"; // Redirect to a different page after dictionary creation.
     }
+
+    @GetMapping("/dictionaries/{dictionaryName}/search")
+    public String searchTranslation(
+            @PathVariable String dictionaryName,
+            @RequestParam("word") String word,
+            Model model) {
+        if (word == null) {
+            return "";
+        }
+
+        Dictionary dictionary = dictionaryService.getDictionaryByName(dictionaryName);
+        List<Translation> translations = dictionary.getTranslations();
+        Word result = translations.stream()
+                .filter((translation -> translation
+                        .getWord()
+                        .getValue()
+                        .contentEquals(word)
+                )).toList().get(0).getTranslatedWord();
+        model.addAttribute("word", word);
+        model.addAttribute("result", result);
+        return "translation";
+//        return "<b>Word:</b> " + word + "<br><b>Translation:</b> " + result.getValue();
+
+    }
 }

@@ -21,6 +21,15 @@
 <body>
 <h1 th:text="${dictionary.getName()}"></h1>
 
+<div class="search-form-container">
+    <form th:action="@{'/dictionaries/' + ${dictionary.getName()} + '/search'}" th:object="${dictionary}" method="get">
+        <label for="word">Word to translate:</label>
+        <input type="text" id="word" name="word" />
+
+        <input type="submit" value="Search" />
+    </form>
+</div>
+
 <!-- Add "Add Translation" button at the top -->
 <div class="table-container">
     <div th:if="${user == 'admin'}">
