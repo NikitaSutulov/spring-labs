@@ -2,7 +2,6 @@ package com.brigade22.spring.springlabs.services;
 
 import com.brigade22.spring.springlabs.entities.Dictionary;
 import com.brigade22.spring.springlabs.repositories.DictionaryRepository;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
