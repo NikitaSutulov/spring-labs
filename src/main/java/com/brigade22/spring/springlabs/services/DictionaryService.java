@@ -37,9 +37,9 @@ public class DictionaryService {
 
     @PostConstruct
     public void initializeSampleData() {
-        Dictionary dictionary1 = new Dictionary("English-Ukrainian");
         Language language1 = new Language("en", "English");
         Language language2 = new Language("ua", "Ukrainian");
+        Dictionary dictionary1 = new Dictionary("English-Ukrainian", language1, language2);
         Word word1 = new Word(language1, "Hello");
         Word word2 = new Word(language2, "Привіт");
         Translation translation1 = new Translation(dictionary1, word1, word2);
@@ -50,8 +50,9 @@ public class DictionaryService {
         dictionary1.addTranslation(translation2);
         dictionary1.addTranslation(translation3);
         dictionary1.addTranslation(translation4);
-        Dictionary dictionary2 = new Dictionary("Polish-Ukrainian");
-        Dictionary dictionary3 = new Dictionary("English-Polish");
+        Language language3 = new Language("pl", "Polish");
+        Dictionary dictionary2 = new Dictionary("Polish-Ukrainian", language3, language2);
+        Dictionary dictionary3 = new Dictionary("English-Polish", language1, language3);
 
         dictionaryRepository.save(dictionary1);
         dictionaryRepository.save(dictionary2);

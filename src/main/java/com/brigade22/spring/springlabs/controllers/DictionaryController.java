@@ -99,7 +99,7 @@ public class DictionaryController {
 
     @GetMapping("/dictionaries/create-dictionary")
     public String showCreateDictionaryForm(Model model) {
-        model.addAttribute("dictionary", new Dictionary(null));
+        model.addAttribute("dictionary", new Dictionary(null, null, null));
         return "create-dictionary";
     }
 
@@ -129,13 +129,13 @@ public class DictionaryController {
             @PathVariable String dictionaryName,
             @RequestParam("word") String word,
             @RequestParam("translatedWord") String translatedWord) {
-//        if (word != null && translatedWord != null) {
-//            Dictionary dictionary = dictionaryService.getDictionaryByName(dictionaryName);
-//
-////            Translation translation = new Translation(dictionary, word, translatedWord);
-//            dictionary.addTranslation(translation);
-//            dictionaryService.saveDictionary(dictionary);
-//        }
+                if (word != null && translatedWord != null) {
+            Dictionary dictionary = dictionaryService.getDictionaryByName(dictionaryName);
+
+            Translation translation = new Translation(dictionary, new Word(dictionary.getLanguage1(), word), new Word(dictionary.getLanguage2(), translatedWord));
+            dictionary.addTranslation(translation);
+            dictionaryService.saveDictionary(dictionary);
+        }
         return "redirect:/dictionaries/" + dictionaryName + "?user=admin";
     }
 
@@ -159,7 +159,6 @@ public class DictionaryController {
         model.addAttribute("word", word);
         model.addAttribute("result", result);
         return "translation";
-//        return "<b>Word:</b> " + word + "<br><b>Translation:</b> " + result.getValue();
 
     }
 }
