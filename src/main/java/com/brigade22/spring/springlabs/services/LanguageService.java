@@ -10,11 +10,9 @@ import java.util.List;
 
 @Service
 public class LanguageService {
-    private LanguageRepository languageRepository;
+    private final LanguageRepository languageRepository;
 
-    // setter
-    @Autowired
-    public void setLanguageRepository(LanguageRepository languageRepository) {
+    public LanguageService(LanguageRepository languageRepository) {
         this.languageRepository = languageRepository;
     }
 

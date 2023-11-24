@@ -14,7 +14,6 @@ public class LanguageController {
 
     private final LanguageService languageService;
 
-    @Autowired
     public LanguageController(LanguageService languageService) {
         this.languageService = languageService;
     }

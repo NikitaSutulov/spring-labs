@@ -11,28 +11,4 @@ import org.springframework.context.annotation.Scope;
 @Configuration
 public class AppConfiguration {
 
-    @Bean
-    @Scope("prototype")
-    public DictionaryService dictionaryService(DictionaryRepository dictionaryRepository) {
-        return new DictionaryService(dictionaryRepository);
-    }
-
-    @Bean
-    @Scope("prototype")
-    public LanguageService languageService(LanguageRepository languageRepository) {
-        LanguageService languageService = new LanguageService();
-        languageService.setLanguageRepository(languageRepository);
-
-        return languageService;
-    }
-
-    @Bean
-    public LanguageRepository languageRepository() {
-        return new LanguageRepository();
-    }
-
-    @Bean
-    public DictionaryRepository dictionaryRepository() {
-        return new DictionaryRepository();
-    }
 }

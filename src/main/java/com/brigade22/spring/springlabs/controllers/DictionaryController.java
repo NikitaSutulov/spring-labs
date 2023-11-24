@@ -18,7 +18,6 @@ public class DictionaryController {
 
     private final DictionaryService dictionaryService;
 
-    @Autowired
     public DictionaryController(DictionaryService dictionaryService) {
         this.dictionaryService = dictionaryService;
     }
