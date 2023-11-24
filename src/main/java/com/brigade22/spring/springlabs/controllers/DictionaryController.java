@@ -26,6 +26,7 @@ public class DictionaryController {
     @GetMapping("/dictionaries")
     public String listLanguages(Model model, @RequestParam(name = "user", required = false) String user) {
         List<Dictionary> dictionaries = dictionaryService.getAll();
+
         model.addAttribute("dictionaries", dictionaries);
         model.addAttribute("user", user);
         return "dictionaries";
@@ -67,6 +68,7 @@ public class DictionaryController {
         Model model
     ) {
         Translation translation = dictionaryService.checkTranslation(dictionaryName, word, translatedWord);
+
         if (translation != null) {
             model.addAttribute("translation", translation);
         }

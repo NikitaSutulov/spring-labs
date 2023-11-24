@@ -19,6 +19,13 @@ public class LanguageService {
     }
 
     public void saveLanguage (Language language) {
+        Language existing = languageRepository.findByCode(language.getCode().toLowerCase());
+
+        if (existing != null) {
+            return;
+        }
+
+        language.setCode(language.getCode().toLowerCase());
         languageRepository.save(language);
     }
 
@@ -36,6 +43,18 @@ public class LanguageService {
 
     public Language findByCode(String code) {
         return languageRepository.findByCode(code); // Delegate to the repository's findByCode method
+    }
+
+
+
+    public void updateLanguage(String code, Language language) {
+        Language existing = languageRepository.findByCode(code);
+        if (existing != null) {
+            existing.setCode(language.getCode().toLowerCase());
+            existing.setName(language.getName());
+        } else {
+            languageRepository.save(language);
+        }
     }
 
     @PostConstruct
