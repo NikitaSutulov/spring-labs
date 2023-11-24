@@ -26,8 +26,6 @@ public class Dictionary {
         this.name = name;
     }
 
-
-
     public List<Translation> getTranslations() {
         return translations;
     }

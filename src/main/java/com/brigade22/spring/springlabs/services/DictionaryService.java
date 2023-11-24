@@ -9,6 +9,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class DictionaryService {
@@ -33,6 +34,46 @@ public class DictionaryService {
 
     public Dictionary getDictionaryByName(String name) {
         return dictionaryRepository.findByName(name);
+    }
+
+    public Word getTranslationForWord(String dictionaryName, String word) {
+        List<Translation> translations = this.getDictionaryByName(dictionaryName).getTranslations();
+        return translations.stream()
+            .filter((translation -> translation
+                .getWord()
+                .getValue()
+                .contentEquals(word)
+            ))
+            .toList()
+            .get(0)
+            .getTranslatedWord();
+    }
+
+    public void addTranslation(String dictionaryName, String word1, String word2) {
+        Dictionary dictionary = this.getDictionaryByName(dictionaryName);
+        Translation translation = new Translation(dictionary, new Word(dictionary.getLanguage1(), word1), new Word(dictionary.getLanguage2(), word2));
+        dictionary.addTranslation(translation);
+    }
+
+    public void updateTranslation(String dictionaryName, String word1, String word2, String updatedWord1, String updatedWord2) {
+        Dictionary dictionary = this.getDictionaryByName(dictionaryName);
+        for (Translation translationSeek : dictionary.getTranslations()) {
+            if (translationSeek.getWord().getValue().equals(word1) && translationSeek.getTranslatedWord().getValue().equals(word2)) {
+                translationSeek.getWord().setValue(updatedWord1);
+                translationSeek.getTranslatedWord().setValue(updatedWord2);
+                break;
+            }
+        }
+    }
+
+    public Translation checkTranslation(String dictionaryName, String word1, String word2) {
+        Dictionary dictionary = getDictionaryByName(dictionaryName);
+        for (Translation translation : dictionary.getTranslations()) {
+            if (translation.getWord().getValue().equals(word1) && translation.getTranslatedWord().getValue().equals(word2)) {
+                return translation;
+            }
+        }
+        return null;
     }
 
     @PostConstruct

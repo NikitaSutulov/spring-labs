@@ -28,4 +28,8 @@ public class Language {
     public void setCode(String code) {
         this.code = code;
     }
+
+    public void addWord(Word word) {
+        this.words.add(word);
+    }
 }
