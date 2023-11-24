@@ -1,11 +1,9 @@
 package com.brigade22.spring.springlabs.controllers;
 
 import com.brigade22.spring.springlabs.entities.Dictionary;
-import com.brigade22.spring.springlabs.entities.Language;
 import com.brigade22.spring.springlabs.entities.Translation;
 import com.brigade22.spring.springlabs.entities.Word;
 import com.brigade22.spring.springlabs.services.DictionaryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
