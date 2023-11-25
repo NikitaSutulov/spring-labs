@@ -23,9 +23,9 @@
 <h1>Dictionaries List</h1>
 
 <div class="table-container">
-<%--    <c:if test="${user eq 'admin'}">--%>
-<%--        <a href="<c:url value='/dictionaries/create-dictionary'/>" class="btn btn-primary btn-space">Create New Dictionary</a>--%>
-<%--    </c:if>--%>
+    <c:if test="${user eq 'admin'}">
+        <a href="<c:url value='/dictionaries/create-dictionary'/>" class="btn btn-primary btn-space">Create New Dictionary</a>
+    </c:if>
 
     <table class="custom-table">
         <thead>
