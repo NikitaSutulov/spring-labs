@@ -77,6 +77,7 @@ public class DictionaryService {
 
     @PostConstruct
     public void initializeSampleData() {
+        dictionaryRepository.clear();
         Language language1 = new Language("en", "English");
         Language language2 = new Language("ua", "Ukrainian");
         Dictionary dictionary1 = new Dictionary("English-Ukrainian", language1, language2);

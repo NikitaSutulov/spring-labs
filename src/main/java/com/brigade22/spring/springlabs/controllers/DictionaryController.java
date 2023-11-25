@@ -1,16 +1,15 @@
 package com.brigade22.spring.springlabs.controllers;
 
+import com.brigade22.spring.springlabs.controllers.responses.GetDictionariesResponse;
 import com.brigade22.spring.springlabs.entities.Dictionary;
 import com.brigade22.spring.springlabs.entities.Translation;
 import com.brigade22.spring.springlabs.entities.Word;
 import com.brigade22.spring.springlabs.services.DictionaryService;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@Controller
+@RestController
+@RequestMapping("/dictionaries")
 public class DictionaryController {
 
     private final DictionaryService dictionaryService;
@@ -19,13 +18,9 @@ public class DictionaryController {
         this.dictionaryService = dictionaryService;
     }
 
-    @GetMapping("/dictionaries")
-    public String listLanguages(Model model, @RequestParam(name = "user", required = false) String user) {
-        List<Dictionary> dictionaries = dictionaryService.getAll();
-
-        model.addAttribute("dictionaries", dictionaries);
-        model.addAttribute("user", user);
-        return "dictionaries";
+    @GetMapping
+    public GetDictionariesResponse getDictionaries() {
+        return new GetDictionariesResponse(dictionaryService.getAll());
     }
 
     @GetMapping("/dictionaries/{name}")

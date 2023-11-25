@@ -32,4 +32,8 @@ public class DictionaryRepository {
         }
         return null; // Return null if no matching dictionary is found
     }
+
+    public void clear() {
+        this.dictionaries.clear();
+    }
 }
