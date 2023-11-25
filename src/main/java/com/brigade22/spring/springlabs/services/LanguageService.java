@@ -3,22 +3,26 @@ package com.brigade22.spring.springlabs.services;
 import com.brigade22.spring.springlabs.entities.Language;
 import com.brigade22.spring.springlabs.repositories.LanguageRepository;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class LanguageService {
-    private LanguageRepository languageRepository;
+    private final LanguageRepository languageRepository;
 
-    // setter
-    @Autowired
-    public void setLanguageRepository(LanguageRepository languageRepository) {
+    public LanguageService(LanguageRepository languageRepository) {
         this.languageRepository = languageRepository;
     }
 
     public void saveLanguage (Language language) {
+        Language existing = languageRepository.findByCode(language.getCode().toLowerCase());
+
+        if (existing != null) {
+            return;
+        }
+
+        language.setCode(language.getCode().toLowerCase());
         languageRepository.save(language);
     }
 
@@ -36,6 +40,18 @@ public class LanguageService {
 
     public Language findByCode(String code) {
         return languageRepository.findByCode(code); // Delegate to the repository's findByCode method
+    }
+
+
+
+    public void updateLanguage(String code, Language language) {
+        Language existing = languageRepository.findByCode(code);
+        if (existing != null) {
+            existing.setCode(language.getCode().toLowerCase());
+            existing.setName(language.getName());
+        } else {
+            languageRepository.save(language);
+        }
     }
 
     @PostConstruct

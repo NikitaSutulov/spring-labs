@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Word {
-    private final String value;
+    private String value;
     private final Language language;
     private final List<Translation> translations = new ArrayList<>();
 
@@ -19,5 +19,9 @@ public class Word {
 
     public Language getLanguage() {
         return language;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }

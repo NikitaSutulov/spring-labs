@@ -2,7 +2,6 @@ package com.brigade22.spring.springlabs.controllers;
 
 import com.brigade22.spring.springlabs.entities.Language;
 import com.brigade22.spring.springlabs.services.LanguageService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +13,6 @@ public class LanguageController {
 
     private final LanguageService languageService;
 
-    @Autowired
     public LanguageController(LanguageService languageService) {
         this.languageService = languageService;
     }
@@ -22,6 +20,7 @@ public class LanguageController {
     @GetMapping("/languages")
     public String listLanguages(Model model, @RequestParam(name = "user", required = false) String user) {
         List<Language> languages = languageService.getAll();
+
         model.addAttribute("languages", languages);
         model.addAttribute("user", user);
         return "languages";
@@ -39,35 +38,22 @@ public class LanguageController {
             return "redirect:/languages?user=admin";
         }
 
-        language.setCode(language.getCode().toLowerCase());
-
-        if (languageService.findByCode(language.getCode()) != null) {
-            return "redirect:/languages?user=admin";
-        }
-
         languageService.saveLanguage(language);
+
         return "redirect:/languages?user=admin";
     }
 
     @GetMapping("/languages/edit-language/{code}")
     public String editLanguageForm(@PathVariable String code, Model model) {
         Language language = languageService.findByCode(code);
+
         model.addAttribute("language", language);
         return "edit-language";
     }
 
     @PostMapping("/languages/edit-language/{code}")
     public String editLanguageSubmit(@PathVariable String code, @ModelAttribute Language language) {
-        Language existingLanguage = languageService.findByCode(code);
-        language.setCode(language.getCode().toLowerCase());
-
-        if (existingLanguage != null) {
-            if (languageService.findByCode(language.getCode()) == null) {
-                existingLanguage.setCode(language.getCode());
-            }
-            existingLanguage.setName(language.getName());
-
-        }
+        languageService.updateLanguage(code, language);
 
         return "redirect:/languages?user=admin";
     }
@@ -75,6 +61,7 @@ public class LanguageController {
     @DeleteMapping("/languages/{code}")
     public String deleteLanguage(@PathVariable String code) {
         languageService.deleteByCode(code);
+
         return "redirect:/languages?user=admin";
     }
 }
