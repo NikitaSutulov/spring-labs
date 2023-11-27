@@ -7,7 +7,7 @@
     <title>Translation</title>
 </head>
 <body>
-<b>Word: </b><span>${word}</span><br>
-<b>Translation: </b><span>${result.getValue()}</span><br>
+<b>Word: </b><span><c:out value="${word}"/></span><br>
+<b>Translation: </b><span><c:out value="${result.getValue()}"/></span><br>
 </body>
 </html>

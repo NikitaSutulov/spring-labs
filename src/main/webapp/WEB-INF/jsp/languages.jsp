@@ -43,8 +43,8 @@
         <tbody>
         <c:forEach var="language" items="${languages}">
             <tr>
-                <td>${language.name}</td>
-                <td>${language.code}</td>
+                <td><c:out value="${language.name}"/></td>
+                <td><c:out value="${language.code}"/></td>
                 <c:if test="${user == 'admin'}">
                     <td>
                         <a href="<c:url value="/languages/edit-language/${language.code}"/>" class="btn btn-primary">Edit</a>

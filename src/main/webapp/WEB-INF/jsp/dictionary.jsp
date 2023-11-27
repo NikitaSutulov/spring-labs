@@ -20,7 +20,7 @@
     </style>
 </head>
 <body>
-<h1>${dictionary.name}</h1>
+<h1><c:out value="${dictionary.name}"/></h1>
 
 <div class="search-form-container">
     <form action="<c:out value='/dictionaries/${dictionary.name}/search' />" method="get">
@@ -52,8 +52,8 @@
         <tbody>
         <c:forEach var="transaltion" items="${dictionary.translations}">
             <tr>
-                <td>${transaltion.word.value}</td>
-                <td>${transaltion.translatedWord.value}</td>
+                <td><c:out value="${transaltion.word.value}"/></td>
+                <td><c:out value="${transaltion.translatedWord.value}"/></td>
                 <c:if test="${user == 'admin'}">
                     <td>
                         <a href="<c:url value="/dictionaries/${dictionary.name}/edit/${transaltion.word.value}-${transaltion.translatedWord.value}"/>" class="btn btn-primary">Edit</a>

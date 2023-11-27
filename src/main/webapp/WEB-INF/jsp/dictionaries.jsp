@@ -39,7 +39,7 @@
         <tbody>
         <c:forEach var="dictionary" items="${dictionaries}">
             <tr>
-                <td>${dictionary.name}</td>
+                <td><c:out value="${dictionary.name}"/></td>
                 <c:if test="${user eq 'admin'}">
                     <td><a href="<c:url value='/dictionaries/${dictionary.name}/edit'/>" class="btn btn-primary">Edit</a></td>
                     <td>
