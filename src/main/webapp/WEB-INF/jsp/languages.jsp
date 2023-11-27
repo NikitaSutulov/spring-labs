@@ -26,9 +26,17 @@
 <!-- Add spacing at the top and bottom of the table -->
 <div class="table-container">
     <!-- Add spacing between the "Create New Language" button -->
-    <c:if test="${user == 'admin'}">
-        <a href="languages/create-language" class="btn btn-primary btn-space">Create New Language</a>
-    </c:if>
+    <c:choose>
+        <c:when test="${user eq 'admin'}">
+            <a href="languages/create-language" class="btn btn-primary btn-space">Create New Language</a>
+        </c:when>
+        <c:when test="${user eq 'Bob'}">
+            <p>Hello Bob</p>
+        </c:when>
+        <c:otherwise>
+            <p>No admin rights for you buddy</p>
+        </c:otherwise>
+    </c:choose>
 
     <!-- Display the list of languages -->
     <table class="custom-table">
