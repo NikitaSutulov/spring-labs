@@ -6,12 +6,12 @@
 </head>
 <body>
 <h1>Create Translation</h1>
-<form action="<c:url value='/dictionaries/${dictionary.name}/create-dictionary'/>" method="post">
+<form action="<c:url value='/dictionaries/${dictionaryName}/create-translation'/>" method="post">
     <label for="word">Word:</label>
     <input type="text" id="word" name="word" value="${translation.word}" />
 
     <label for="translation">Translation:</label>
-    <input type="text" id="translation" name="translation" value="${translation.translatedWord}" />
+    <input type="text" id="translation" name="translatedWord" value="${translation.translatedWord}" />
 
     <input type="submit" value="Create" />
 </form>

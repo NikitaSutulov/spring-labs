@@ -98,4 +98,10 @@ public class DictionaryService {
         dictionaryRepository.save(dictionary2);
         dictionaryRepository.save(dictionary3);
     }
+
+    public void deleteTranslation(String dictionaryName, String word, String translatedWord) {
+        Dictionary dictionary = this.getDictionaryByName(dictionaryName);
+        Translation translation = this.checkTranslation(dictionaryName, word, translatedWord);
+        dictionary.deleteTranslation(translation);
+    }
 }

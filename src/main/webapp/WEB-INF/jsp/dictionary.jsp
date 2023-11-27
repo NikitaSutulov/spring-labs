@@ -23,7 +23,7 @@
 <h1>${dictionary.name}</h1>
 
 <div class="search-form-container">
-    <form action="<c:url value='/dictionaries/' />${dictionary.name}'/search>" method="get">
+    <form action="<c:out value='/dictionaries/${dictionary.name}/search' />" method="get">
         <label for="word">Word to translate:</label>
         <input type="text" id="word" name="word" />
 
@@ -56,10 +56,10 @@
                 <td>${transaltion.translatedWord.value}</td>
                 <c:if test="${user == 'admin'}">
                     <td>
-                        <a href="<c:url value="dictionaries/${dictionary.name}/edit/${transaltion.word.value}-${transaltion.translatedWord.value}"/>" class="btn btn-primary">Edit</a>
+                        <a href="<c:url value="/dictionaries/${dictionary.name}/edit/${transaltion.word.value}-${transaltion.translatedWord.value}"/>" class="btn btn-primary">Edit</a>
                     </td>
                     <td>
-                        <form action="<c:out value="/dictionaries/delete/${transaltion.word}" />" method="post">
+                        <form action="<c:out value="/dictionaries/${dictionary.name}/delete-translation/${transaltion.word.value}-${transaltion.translatedWord.value}" />" method="post">
                             <input type="hidden" name="_method" value="DELETE" />
                             <button type="submit">Delete</button>
                         </form>

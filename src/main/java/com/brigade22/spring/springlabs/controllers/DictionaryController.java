@@ -126,6 +126,17 @@ public class DictionaryController {
         return "redirect:/dictionaries/" + dictionaryName + "?user=admin";
     }
 
+    @DeleteMapping("/dictionaries/{dictionaryName}/delete-translation/{word}-{translatedWord}")
+    public String deleteTranslation(
+        @PathVariable String dictionaryName,
+        @PathVariable String word,
+        @PathVariable String translatedWord
+    ) {
+        dictionaryService.deleteTranslation(dictionaryName, word, translatedWord);
+
+        return "redirect:/dictionaries/" + dictionaryName + "?user=admin";
+    }
+
     @GetMapping("/dictionaries/{dictionaryName}/search")
     public String searchTranslation(
         @PathVariable String dictionaryName,
