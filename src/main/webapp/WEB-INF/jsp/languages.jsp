@@ -55,12 +55,12 @@
                 <td><c:out value="${language.code}"/></td>
                 <c:if test="${user == 'admin'}">
                     <td>
-                        <a href="<c:url value="/languages/edit-language/${language.code}"/>" class="btn btn-primary">Edit</a>
+                        <a href="<c:out value="/languages/edit-language/${language.code}"/>" class="btn btn-primary">Edit</a>
                     </td>
                 </c:if>
                 <c:if test="${user == 'admin'}">
                     <td>
-                        <form action="<c:url value="/languages/${language.code}"/>" method="post">
+                        <form action="<c:out value="/languages/${language.code}"/>" method="post">
                             <input type="hidden" name="_method" value="DELETE" />
                             <button type="submit">Delete</button>
                         </form>

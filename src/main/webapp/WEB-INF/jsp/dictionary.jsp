@@ -56,7 +56,7 @@
                 <td><c:out value="${transaltion.translatedWord.value}"/></td>
                 <c:if test="${user == 'admin'}">
                     <td>
-                        <a href="<c:url value="/dictionaries/${dictionary.name}/edit/${transaltion.word.value}-${transaltion.translatedWord.value}"/>" class="btn btn-primary">Edit</a>
+                        <a href="<c:out value="/dictionaries/${dictionary.name}/edit/${transaltion.word.value}-${transaltion.translatedWord.value}"/>" class="btn btn-primary">Edit</a>
                     </td>
                     <td>
                         <form action="<c:out value="/dictionaries/${dictionary.name}/delete-translation/${transaltion.word.value}-${transaltion.translatedWord.value}" />" method="post">

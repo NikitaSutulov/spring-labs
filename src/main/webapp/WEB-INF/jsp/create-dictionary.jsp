@@ -6,7 +6,7 @@
 </head>
 <body>
 <h1>Create Dictionary</h1>
-<form action="<c:url value='/dictionaries/create-dictionary'/>" method="post">
+<form action="<c:out value='/dictionaries/create-dictionary'/>" method="post">
     <label for="name">Name:</label>
     <input type="text" id="name" name="name" value="${name}" />
 

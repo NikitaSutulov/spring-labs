@@ -24,7 +24,7 @@
 
 <div class="table-container">
     <c:if test="${user eq 'admin'}">
-        <a href="<c:url value='/dictionaries/create-dictionary'/>" class="btn btn-primary btn-space">Create New Dictionary</a>
+        <a href="<c:out value='/dictionaries/create-dictionary'/>" class="btn btn-primary btn-space">Create New Dictionary</a>
     </c:if>
 
     <table class="custom-table">
@@ -41,15 +41,15 @@
             <tr>
                 <td><c:out value="${dictionary.name}"/></td>
                 <c:if test="${user eq 'admin'}">
-                    <td><a href="<c:url value='/dictionaries/${dictionary.name}/edit'/>" class="btn btn-primary">Edit</a></td>
+                    <td><a href="<c:out value='/dictionaries/${dictionary.name}/edit'/>" class="btn btn-primary">Edit</a></td>
                     <td>
-                        <form action="<c:url value='/dictionaries/${dictionary.name}'/>" method="post">
+                        <form action="<c:out value='/dictionaries/${dictionary.name}'/>" method="post">
                             <input type="hidden" name="_method" value="DELETE" />
                             <button type="submit">Delete</button>
                         </form>
                     </td>
                 </c:if>
-                <td><a href="<c:url value='/dictionaries/${dictionary.name}'/>" class="btn btn-success">Open</a></td>
+                <td><a href="<c:out value='/dictionaries/${dictionary.name}'/>" class="btn btn-success">Open</a></td>
             </tr>
         </c:forEach>
         </tbody>

@@ -9,7 +9,7 @@
 <body>
 <h1>Edit Dictionary</h1>
 
-<form action="<c:url value='/dictionaries/' />${dictionary.name}/edit" modelAttribute="dictionary" method="post">
+<form action="<c:out value='/dictionaries/' />${dictionary.name}/edit" modelAttribute="dictionary" method="post">
     <label for="name">Name:</label>
     <input type="text" id="name" name="name" value="${dictionary.name}" />
 

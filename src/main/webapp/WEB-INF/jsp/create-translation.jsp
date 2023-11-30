@@ -6,7 +6,7 @@
 </head>
 <body>
 <h1>Create Translation</h1>
-<form action="<c:url value='/dictionaries/${dictionaryName}/create-translation'/>" method="post">
+<form action="<c:out value='/dictionaries/${dictionaryName}/create-translation'/>" method="post">
     <label for="word">Word:</label>
     <input type="text" id="word" name="word" value="${translation.word}" />
 
