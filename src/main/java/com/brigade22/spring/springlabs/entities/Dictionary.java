@@ -49,4 +49,8 @@ public class Dictionary {
     public void setLanguage2(Language language) {
         this.language2 = language;
     }
+
+    public void deleteTranslation(Translation translation) {
+        this.translations.remove(translation);
+    }
 }

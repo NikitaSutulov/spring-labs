@@ -9,7 +9,6 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class DictionaryService {
@@ -98,5 +97,11 @@ public class DictionaryService {
         dictionaryRepository.save(dictionary1);
         dictionaryRepository.save(dictionary2);
         dictionaryRepository.save(dictionary3);
+    }
+
+    public void deleteTranslation(String dictionaryName, String word, String translatedWord) {
+        Dictionary dictionary = this.getDictionaryByName(dictionaryName);
+        Translation translation = this.checkTranslation(dictionaryName, word, translatedWord);
+        dictionary.deleteTranslation(translation);
     }
 }

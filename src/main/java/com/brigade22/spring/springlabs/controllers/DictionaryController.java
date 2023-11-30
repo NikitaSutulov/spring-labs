@@ -1,24 +1,20 @@
 package com.brigade22.spring.springlabs.controllers;
 
 import com.brigade22.spring.springlabs.entities.Dictionary;
-import com.brigade22.spring.springlabs.entities.Language;
 import com.brigade22.spring.springlabs.entities.Translation;
 import com.brigade22.spring.springlabs.entities.Word;
 import com.brigade22.spring.springlabs.services.DictionaryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 
 @Controller
 public class DictionaryController {
 
     private final DictionaryService dictionaryService;
 
-    @Autowired
     public DictionaryController(DictionaryService dictionaryService) {
         this.dictionaryService = dictionaryService;
     }
@@ -26,6 +22,7 @@ public class DictionaryController {
     @GetMapping("/dictionaries")
     public String listLanguages(Model model, @RequestParam(name = "user", required = false) String user) {
         List<Dictionary> dictionaries = dictionaryService.getAll();
+
         model.addAttribute("dictionaries", dictionaries);
         model.addAttribute("user", user);
         return "dictionaries";
@@ -67,6 +64,7 @@ public class DictionaryController {
         Model model
     ) {
         Translation translation = dictionaryService.checkTranslation(dictionaryName, word, translatedWord);
+
         if (translation != null) {
             model.addAttribute("translation", translation);
         }
@@ -124,6 +122,17 @@ public class DictionaryController {
         if (word != null && translatedWord != null) {
             dictionaryService.addTranslation(dictionaryName, word, translatedWord);
         }
+
+        return "redirect:/dictionaries/" + dictionaryName + "?user=admin";
+    }
+
+    @DeleteMapping("/dictionaries/{dictionaryName}/delete-translation/{word}-{translatedWord}")
+    public String deleteTranslation(
+        @PathVariable String dictionaryName,
+        @PathVariable String word,
+        @PathVariable String translatedWord
+    ) {
+        dictionaryService.deleteTranslation(dictionaryName, word, translatedWord);
 
         return "redirect:/dictionaries/" + dictionaryName + "?user=admin";
     }
