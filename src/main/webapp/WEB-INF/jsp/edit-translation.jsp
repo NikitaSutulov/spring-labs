@@ -7,7 +7,7 @@
 <body>
 <h1>Edit Translation</h1>
 
-<form action="/dictionaries/${dictionaryName}/${translation.word.value}-${translation.translatedWord.value}" method="post">
+<form action="${pageContext.request.contextPath}/dictionaries/${dictionaryName}/${translation.word.value}-${translation.translatedWord.value}" method="post">
     <input type="hidden" name="_method" value="put">
 
     <label for="word">Word:</label>
