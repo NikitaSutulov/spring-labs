@@ -7,7 +7,7 @@
 <body>
 <h1>Create Language</h1>
 
-<form action="${pageContext.request.contextPath}/languages/create-language" method="post">
+<form action="${pageContext.request.contextPath}/languages" method="post">
     <label for="name">Name:</label>
     <input type="text" id="name" name="name" value="" />
 

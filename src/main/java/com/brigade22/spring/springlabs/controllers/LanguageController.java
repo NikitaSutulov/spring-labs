@@ -32,7 +32,7 @@ public class LanguageController {
         return "create-language";
     }
 
-    @PostMapping("/languages/create-language")
+    @PostMapping("/languages")
     public String createLanguage(@ModelAttribute Language language) {
         if (language.getCode() == null || language.getName() == null) {
             return "redirect:/languages?user=admin";
@@ -51,7 +51,7 @@ public class LanguageController {
         return "edit-language";
     }
 
-    @PostMapping("/languages/edit-language/{code}")
+    @PutMapping("/languages/{code}")
     public String editLanguageSubmit(@PathVariable String code, @ModelAttribute Language language) {
         languageService.updateLanguage(code, language);
 

@@ -71,7 +71,7 @@ public class DictionaryController {
         return "edit-translation";
     }
 
-    @PostMapping("/dictionaries/{dictionaryName}/edit/{word}-{translatedWord}")
+    @PutMapping("/dictionaries/{dictionaryName}/{word}-{translatedWord}")
     public String editTranslation(
         @PathVariable String dictionaryName,
         @PathVariable String word,

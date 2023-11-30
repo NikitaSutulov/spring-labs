@@ -7,7 +7,8 @@
 <body>
 <h1>Edit Language</h1>
 
-<form action="${pageContext.request.contextPath}/languages/edit-language/${language.code}" method="post">
+<form action="${pageContext.request.contextPath}/languages/${language.code}" method="post">
+    <input type="hidden" name="_method" value="put">
 
     <label for="name">Name:</label>
     <input type="text" id="name" name="name" value="${language.name}" />
