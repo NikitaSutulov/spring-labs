@@ -19,24 +19,27 @@ public class DictionaryService {
         this.dictionaryRepository = dictionaryRepository;
     }
 
-    public void saveDictionary (Dictionary dictionary) {
-        dictionaryRepository.save(dictionary);
+    public Dictionary saveDictionary (Dictionary dictionary) {
+        return dictionaryRepository.save(dictionary);
     }
 
     public List<Dictionary> getAll() {
         return dictionaryRepository.findAll();
     }
 
-    public void deleteDictionary(String name) {
-        dictionaryRepository.delete(name);
+    public void deleteDictionary(Dictionary dictionary) {
+        dictionaryRepository.delete(dictionary);
+    }
+    public Dictionary deleteDictionaryById(long id) {
+        return dictionaryRepository.deleteById(id);
     }
 
-    public Dictionary getDictionaryByName(String name) {
-        return dictionaryRepository.findByName(name);
+    public Dictionary getDictionaryById(Long id) {
+        return dictionaryRepository.findById(id);
     }
 
-    public Word getTranslationForWord(String dictionaryName, String word) {
-        List<Translation> translations = this.getDictionaryByName(dictionaryName).getTranslations();
+    public Word getTranslationForWord(Long id, String word) {
+        List<Translation> translations = this.getDictionaryById(id).getTranslations();
         return translations.stream()
             .filter((translation -> translation
                 .getWord()
@@ -48,25 +51,34 @@ public class DictionaryService {
             .getTranslatedWord();
     }
 
-    public void addTranslation(String dictionaryName, String word1, String word2) {
-        Dictionary dictionary = this.getDictionaryByName(dictionaryName);
+    public void addTranslation(Long id, String word1, String word2) {
+        Dictionary dictionary = this.getDictionaryById(id);
         Translation translation = new Translation(dictionary, new Word(dictionary.getLanguage1(), word1), new Word(dictionary.getLanguage2(), word2));
         dictionary.addTranslation(translation);
     }
 
-    public void updateTranslation(String dictionaryName, String word1, String word2, String updatedWord1, String updatedWord2) {
-        Dictionary dictionary = this.getDictionaryByName(dictionaryName);
+    public Dictionary updateDictionary(Long id, String name, Language language1, Language language2) {
+        return dictionaryRepository.update(id, new Dictionary(id, name, language1, language2));
+    }
+
+    public void updateTranslation(Long id, String word1, String word2, String updatedWord1, String updatedWord2) {
+        Dictionary dictionary = this.getDictionaryById(id);
+        boolean translationFound = false;
         for (Translation translationSeek : dictionary.getTranslations()) {
             if (translationSeek.getWord().getValue().equals(word1) && translationSeek.getTranslatedWord().getValue().equals(word2)) {
                 translationSeek.getWord().setValue(updatedWord1);
                 translationSeek.getTranslatedWord().setValue(updatedWord2);
+                translationFound = true;
                 break;
             }
         }
+        if (!translationFound) {
+            throw new IllegalArgumentException("Translation not found");
+        }
     }
 
-    public Translation checkTranslation(String dictionaryName, String word1, String word2) {
-        Dictionary dictionary = getDictionaryByName(dictionaryName);
+    public Translation checkTranslation(Long id, String word1, String word2) {
+        Dictionary dictionary = getDictionaryById(id);
         for (Translation translation : dictionary.getTranslations()) {
             if (translation.getWord().getValue().equals(word1) && translation.getTranslatedWord().getValue().equals(word2)) {
                 return translation;

@@ -1,10 +1,14 @@
 package com.brigade22.spring.springlabs.entities;
 
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Language {
+    @NotBlank
     private String code;
+    @NotBlank
     private String name;
     private final List<Word> words = new ArrayList<>();;
 

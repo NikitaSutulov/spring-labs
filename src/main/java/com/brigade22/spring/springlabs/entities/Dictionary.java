@@ -1,21 +1,46 @@
 package com.brigade22.spring.springlabs.entities;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Dictionary {
+    private long id;
+    @NotBlank
     private String name;
 
+    @Valid
     private Language language1;
+    @Valid
 
     private Language language2;
 
     private final List<Translation> translations = new ArrayList<>();
 
+    public Dictionary() {
+    }
+
     public Dictionary(String name, Language language1, Language language2) {
         this.name = name;
         this.language1 = language1;
         this.language2 = language2;
+    }
+
+    public Dictionary(long id, String name, Language language1, Language language2) {
+        this.id = id;
+        this.name = name;
+        this.language1 = language1;
+        this.language2 = language2;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -48,5 +73,10 @@ public class Dictionary {
 
     public void setLanguage2(Language language) {
         this.language2 = language;
+    }
+
+    public void setTranslations(List<Translation> translations) {
+        this.translations.clear();
+        this.translations.addAll(translations);
     }
 }

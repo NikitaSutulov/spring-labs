@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 public class LanguageController {
 
     private final LanguageService languageService;
@@ -18,12 +18,8 @@ public class LanguageController {
     }
 
     @GetMapping("/languages")
-    public String listLanguages(Model model, @RequestParam(name = "user", required = false) String user) {
-        List<Language> languages = languageService.getAll();
-
-        model.addAttribute("languages", languages);
-        model.addAttribute("user", user);
-        return "languages";
+    public List<Language> listLanguages() {
+        return languageService.getAll();
     }
 
     @GetMapping("/languages/create-language")

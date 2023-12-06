@@ -1,141 +1,172 @@
 package com.brigade22.spring.springlabs.controllers;
 
+import com.brigade22.spring.springlabs.controllers.requests.TranslationRequest;
+import com.brigade22.spring.springlabs.controllers.responses.DictionaryResponse;
 import com.brigade22.spring.springlabs.controllers.responses.GetDictionariesResponse;
+import com.brigade22.spring.springlabs.controllers.responses.TranslationResponse;
 import com.brigade22.spring.springlabs.entities.Dictionary;
-import com.brigade22.spring.springlabs.entities.Translation;
+import com.brigade22.spring.springlabs.entities.Language;
 import com.brigade22.spring.springlabs.entities.Word;
 import com.brigade22.spring.springlabs.services.DictionaryService;
-import org.springframework.ui.Model;
+import com.brigade22.spring.springlabs.services.LanguageService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/dictionaries")
 public class DictionaryController {
 
     private final DictionaryService dictionaryService;
+    private final LanguageService languageService;
 
-    public DictionaryController(DictionaryService dictionaryService) {
+    public DictionaryController(DictionaryService dictionaryService, LanguageService languageService) {
         this.dictionaryService = dictionaryService;
+        this.languageService = languageService;
     }
 
     @GetMapping
-    public GetDictionariesResponse getDictionaries() {
-        return new GetDictionariesResponse(dictionaryService.getAll());
+    public ResponseEntity<GetDictionariesResponse> getDictionaries() {
+        return ResponseEntity.ok(new GetDictionariesResponse(dictionaryService.getAll()));
     }
 
-    @GetMapping("/dictionaries/{name}")
-    public String openDictionary(@PathVariable String name, Model model, @RequestParam(name = "user", required = false) String user) {
+    @GetMapping("{id}")
+    public ResponseEntity<DictionaryResponse> openDictionary(@PathVariable Long id) {
+        Dictionary dictionary = dictionaryService.getDictionaryById(id);
+        if (dictionary == null) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Dictionary not found"
+            );
+        }
 
-        Dictionary dictionary = dictionaryService.getDictionaryByName(name);
+        return ResponseEntity.ok(new DictionaryResponse(dictionary));
+    }
 
-        if (dictionary != null) {
-            model.addAttribute("dictionary", dictionary);
-            model.addAttribute("user", user);
-            return "dictionary";
-        } else {
-            return "error";
+    @PutMapping("{id}")
+    public ResponseEntity<DictionaryResponse> editDictionary(@PathVariable Long id, @Valid @RequestBody Dictionary requestDictionary) {
+        Dictionary dictionary = dictionaryService.getDictionaryById(id);
+        if (dictionary == null) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Dictionary not found"
+            );
+        }
+
+        try {
+            Dictionary changedDictionary = dictionaryService.updateDictionary(id, requestDictionary.getName(), requestDictionary.getLanguage1(), requestDictionary.getLanguage2());
+            return ResponseEntity.ok(new DictionaryResponse(changedDictionary));
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Data is wrong"
+            );
         }
     }
 
-    @GetMapping("dictionaries/{dictionaryName}/edit")
-    public String editDictionary(@PathVariable String dictionaryName, Model model) {
-        Dictionary dictionary = dictionaryService.getDictionaryByName(dictionaryName);
-        model.addAttribute("dictionary", dictionary);
-        return "edit-dictionary";
-    }
-
-    @PostMapping("dictionaries/{dictionaryName}/edit")
-    public String editDictionary(@PathVariable String dictionaryName, @RequestParam("name") String updatedName) {
-        Dictionary dictionary = dictionaryService.getDictionaryByName(dictionaryName);
-        dictionary.setName(updatedName);
-        return "redirect:/dictionaries?user=admin";
-    }
-
-    @GetMapping("/dictionaries/{dictionaryName}/edit/{word}-{translatedWord}")
-    public String editTranslation(
-        @PathVariable String dictionaryName,
-        @PathVariable String word,
-        @PathVariable String translatedWord,
-        Model model
+    @PutMapping("{id}/{word}-{translatedWord}")
+    public ResponseEntity<TranslationResponse> editTranslation(
+            @PathVariable Long id,
+            @PathVariable String word,
+            @PathVariable String translatedWord,
+            @Valid @RequestBody TranslationRequest translation
     ) {
-        Translation translation = dictionaryService.checkTranslation(dictionaryName, word, translatedWord);
-
-        if (translation != null) {
-            model.addAttribute("translation", translation);
+        try {
+            dictionaryService.updateTranslation(id, word, translatedWord, translation.getWord(), translation.getTranslatedWord());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Translation not found"
+            );
         }
-        return "edit-translation";
+
+        return ResponseEntity.ok(new TranslationResponse(translation.getWord(), translation.getTranslatedWord()));
     }
 
-    @PostMapping("/dictionaries/{dictionaryName}/edit/{word}-{translatedWord}")
-    public String editTranslation(
-        @PathVariable String dictionaryName,
-        @PathVariable String word,
-        @PathVariable String translatedWord,
-        @RequestParam("word") String updatedWord,
-        @RequestParam("translatedWord") String updatedTranslatedWord
+    @PostMapping
+    public ResponseEntity<DictionaryResponse> createDictionary(@Valid @RequestBody Dictionary requestDictionary) {
+        if (languageService.findByCode(requestDictionary.getLanguage1().getCode()) == null) {
+            languageService.saveLanguage(requestDictionary.getLanguage1());
+        }
+        Language language1 = languageService.findByCode(requestDictionary.getLanguage1().getCode());
+        if (languageService.findByCode(requestDictionary.getLanguage2().getCode()) == null) {
+            languageService.saveLanguage(requestDictionary.getLanguage2());
+        }
+        Language language2 = languageService.findByCode(requestDictionary.getLanguage2().getCode());
+
+        if (!Objects.equals(requestDictionary.getLanguage1().getName(), language1.getName()) || !Objects.equals(requestDictionary.getLanguage2().getName(), language2.getName())) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Language name is wrong"
+            );
+        }
+
+        Dictionary dictionary = new Dictionary(
+                requestDictionary.getName(),
+                language1,
+                language2
+        );
+
+        dictionary = dictionaryService.saveDictionary(dictionary);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(dictionary.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(new DictionaryResponse(dictionary));
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<DictionaryResponse> deleteLanguage(@PathVariable Long id) {
+        Dictionary dictionary = dictionaryService.deleteDictionaryById(id);
+
+        if (dictionary == null) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Dictionary not found"
+            );
+        }
+
+        return ResponseEntity.ok(new DictionaryResponse(dictionary));
+    }
+
+    @PostMapping("{id}")
+    public ResponseEntity<TranslationResponse> createTranslation(
+            @PathVariable Long id,
+            @Valid @RequestBody TranslationRequest translationRequest
     ) {
-        dictionaryService.updateTranslation(dictionaryName, word, translatedWord, updatedWord, updatedTranslatedWord);
-
-        return "redirect:/dictionaries/" + dictionaryName + "?user=admin";
-    }
-
-    @GetMapping("/dictionaries/create-dictionary")
-    public String showCreateDictionaryForm(Model model) {
-        model.addAttribute("dictionary", new Dictionary(null, null, null));
-        return "create-dictionary";
-    }
-
-    @PostMapping("/dictionaries/create-dictionary")
-    public String createDictionary(@ModelAttribute Dictionary dictionary) {
-        if (dictionary.getName() != null) {
-            dictionaryService.saveDictionary(dictionary);
+        if (dictionaryService.getDictionaryById(id) == null) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Dictionary not found"
+            );
         }
 
-        return "redirect:/dictionaries";
+        dictionaryService.addTranslation(id, translationRequest.getWord(), translationRequest.getTranslatedWord());
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}/{word}-{translateWord}")
+                .buildAndExpand(id, translationRequest.getWord(), translationRequest.getTranslatedWord())
+                .toUri();
+
+        return ResponseEntity.created(location).body(new TranslationResponse(translationRequest.getWord(), translationRequest.getTranslatedWord()));
     }
 
-    @DeleteMapping("/dictionaries/{name}")
-    public String deleteLanguage(@PathVariable String name) {
-        dictionaryService.deleteDictionary(name);
-
-        return "redirect:/dictionaries?user=admin";
-    }
-
-    @GetMapping("/dictionaries/{dictionaryName}/create-translation")
-    public String showCreateTranslationForm(@PathVariable String dictionaryName, Model model) {
-        model.addAttribute("dictionaryName", dictionaryName);
-        model.addAttribute("translation", new Translation(dictionaryService.getDictionaryByName(dictionaryName), null, null));
-        return "create-translation";
-    }
-
-    @PostMapping("/dictionaries/{dictionaryName}/create-translation")
-    public String createTranslation(
-        @PathVariable String dictionaryName,
-        @RequestParam("word") String word,
-        @RequestParam("translatedWord") String translatedWord
+    @GetMapping("{id}/{word}")
+    public ResponseEntity<TranslationResponse> searchTranslation(
+            @PathVariable Long id,
+            @PathVariable String word
     ) {
-        if (word != null && translatedWord != null) {
-            dictionaryService.addTranslation(dictionaryName, word, translatedWord);
-        }
+        Word result = dictionaryService.getTranslationForWord(id, word);
 
-        return "redirect:/dictionaries/" + dictionaryName + "?user=admin";
-    }
-
-    @GetMapping("/dictionaries/{dictionaryName}/search")
-    public String searchTranslation(
-        @PathVariable String dictionaryName,
-        @RequestParam("word") String word,
-        Model model
-    ) {
-        if (word == null) {
-            return "";
-        }
-
-        Word result = dictionaryService.getTranslationForWord(dictionaryName, word);
-
-        model.addAttribute("word", word);
-        model.addAttribute("result", result);
-        return "translation";
-
+        return ResponseEntity.ok(new TranslationResponse(word, result.getValue()));
     }
 }

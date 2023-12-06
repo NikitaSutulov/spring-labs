@@ -7,33 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class DictionaryRepository {
-    private final List<Dictionary> dictionaries = new ArrayList<>();
+public interface DictionaryRepository {
 
-    public DictionaryRepository() {}
+    Dictionary save(Dictionary dictionary);
 
-    public void save(Dictionary dictionary) {
-        this.dictionaries.add(dictionary);
-    }
+    List<Dictionary> findAll();
 
-    public List<Dictionary> findAll() {
-        return this.dictionaries;
-    }
+    void delete(Dictionary dictionary);
+    Dictionary deleteById(long id);
 
-    public void delete(String name) {
-        this.dictionaries.removeIf((d) -> d.getName().equals(name));
-    }
+    Dictionary findById(Long id);
 
-    public Dictionary findByName(String name) {
-        for (Dictionary dictionary : dictionaries) {
-            if (dictionary.getName().equals(name)) {
-                return dictionary; // Return the dictionary if the name matches
-            }
-        }
-        return null; // Return null if no matching dictionary is found
-    }
-
-    public void clear() {
-        this.dictionaries.clear();
-    }
+    void clear();
+    Dictionary update(Long id, Dictionary dictionary);
 }

@@ -17,7 +17,7 @@ public class GetDictionariesResponse {
             for (Translation translation : dictionary.getTranslations()) {
                 translations.add(new TranslationResponse(translation.getWord().getValue(), translation.getTranslatedWord().getValue()));
             }
-            this.dictionaries.add(new DictionaryResponse(dictionary.getName(), dictionary.getLanguage1().getCode(), dictionary.getLanguage2().getCode(), translations));
+            this.dictionaries.add(new DictionaryResponse(dictionary.getId(), dictionary.getName(), dictionary.getLanguage1().getCode(), dictionary.getLanguage2().getCode(), translations));
         }
     }
 
@@ -26,61 +26,3 @@ public class GetDictionariesResponse {
     }
 }
 
-class DictionaryResponse {
-    private String name;
-    private String language;
-    private String translatedLanguage;
-    private List<TranslationResponse> translations;
-
-    public DictionaryResponse(String name, String language, String translatedLanguage, List<TranslationResponse> translations) {
-        this.name = name;
-        this.language = language;
-        this.translatedLanguage = language;
-        this.translations = translations;
-    }
-
-    public DictionaryResponse(Dictionary dictionary) {
-        List<TranslationResponse> translations = new ArrayList<>();
-        for (Translation translation : dictionary.getTranslations()) {
-            translations.add(new TranslationResponse(translation.getWord().getValue(), translation.getTranslatedWord().getValue()));
-        }
-        this.name = dictionary.getName();
-        this.language = dictionary.getLanguage1().getCode();
-        this.translatedLanguage = dictionary.getLanguage2().getCode();
-        this.translations = translations;
-    }
-
-    public List<TranslationResponse> getTranslations() {
-        return translations;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getTranslatedLanguage() {
-        return translatedLanguage;
-    }
-}
-
-class TranslationResponse {
-    private String word;
-    private String translation;
-
-    public TranslationResponse(String word, String translation) {
-        this.word = word;
-        this.translation = translation;
-    }
-
-    public String getTranslation() {
-        return translation;
-    }
-
-    public String getWord() {
-        return word;
-    }
-}
