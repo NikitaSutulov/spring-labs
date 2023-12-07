@@ -24,10 +24,6 @@ public class LanguageService {
         return languageRepository.findAll();
     }
 
-    public void deleteLanguage(String code) {
-        languageRepository.delete(code);
-    }
-
     public Language deleteByCode(String code) {
         return languageRepository.deleteByCode(code);
     }

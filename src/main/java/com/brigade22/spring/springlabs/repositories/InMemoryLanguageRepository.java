@@ -23,10 +23,6 @@ public class InMemoryLanguageRepository implements LanguageRepository {
         return this.languages;
     }
 
-    public void delete(String code) {
-        this.languages.removeIf((l) -> l.getCode().equals(code));
-    }
-
     public Language deleteByCode(String code) {
         for (int i = 0; i < languages.size(); i++) {
             if (languages.get(i).getCode().equals(code)) {

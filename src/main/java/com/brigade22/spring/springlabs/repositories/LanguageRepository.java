@@ -9,7 +9,6 @@ import java.util.List;
 public interface LanguageRepository {
     Language save(Language language);
     List<Language> findAll();
-    void delete(String code);
     Language deleteByCode(String code);
     Language findByCode(String code);
     Language findByName(String name);

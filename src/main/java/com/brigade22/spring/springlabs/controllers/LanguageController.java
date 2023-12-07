@@ -40,19 +40,19 @@ public class LanguageController {
         return ResponseEntity.ok(language);
     }
 
-    @PutMapping
+    @PostMapping
     public ResponseEntity<Language> createLanguage(@Valid @RequestBody Language languageDto) {
         if (languageService.findByCode(languageDto.getCode()) != null) {
             throw new ResponseStatusException(
                     org.springframework.http.HttpStatus.BAD_REQUEST,
-                    "Language code is wrong"
+                    "Language with such a code already exists"
             );
         }
 
         if (languageService.findByName(languageDto.getName()) != null) {
             throw new ResponseStatusException(
                     org.springframework.http.HttpStatus.BAD_REQUEST,
-                    "Language name is wrong"
+                    "Language with such a name already exists"
             );
         }
 
@@ -71,14 +71,6 @@ public class LanguageController {
     public ResponseEntity<Language> editLanguage(
             @PathVariable String code,
             @Valid @RequestBody Language languageDto) {
-        Language language = languageService.findByCode(code);
-
-        if (language == null) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.BAD_REQUEST,
-                    "Language is not found"
-            );
-        }
 
         if (languageService.findByName(languageDto.getName()) != null) {
             throw new ResponseStatusException(
@@ -87,7 +79,7 @@ public class LanguageController {
             );
         }
 
-        language = languageService.updateLanguage(code, languageDto);
+        Language language = languageService.updateLanguage(code, languageDto);
 
         return ResponseEntity.ok(language);
     }
