@@ -256,10 +256,13 @@ public class DictionaryController {
             );
         }
 
-        dictionaryService.addTranslation(id, translationRequest.getWord(), translationRequest.getTranslatedWord());
+        String word = translationRequest.getWord();
+        String translatedWord = translationRequest.getTranslatedWord();
+
+        dictionaryService.addTranslation(id, word, translatedWord);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}/{word}-{translateWord}")
+                .path("/" + word + "-" + translatedWord)
                 .buildAndExpand(id, translationRequest.getWord(), translationRequest.getTranslatedWord())
                 .toUri();
 
