@@ -9,6 +9,13 @@ import com.brigade22.spring.springlabs.entities.Language;
 import com.brigade22.spring.springlabs.entities.Word;
 import com.brigade22.spring.springlabs.services.DictionaryService;
 import com.brigade22.spring.springlabs.services.LanguageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -27,6 +34,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/dictionaries")
 @Validated
+@Tag(name = "Dictionaries", description = "Operations related to dictionaries")
 public class DictionaryController {
 
     private final DictionaryService dictionaryService;
@@ -39,6 +47,20 @@ public class DictionaryController {
 
     @GetMapping
     @Valid
+    @Operation(
+            summary = "Get Dictionaries",
+            description = "Get a list of dictionaries with optional filtering by language code.",
+            parameters = {
+                    @Parameter(name = "code", description = "Language code to filter dictionaries."),
+                    @Parameter(name = "page", description = "Page number (default: 0)."),
+                    @Parameter(name = "size", description = "Number of items per page (default: 10).")
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved dictionaries.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetDictionariesResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters.")
+    })
     public ResponseEntity<GetDictionariesResponse> getDictionaries(
             @RequestParam(name = "code", required = false) @NotBlank String code,
             @RequestParam(name = "page", defaultValue = "0") @PositiveOrZero int page,
@@ -62,6 +84,16 @@ public class DictionaryController {
     }
 
     @GetMapping("{id}")
+    @Operation(
+            summary = "Open Dictionary",
+            description = "Get details of a specific dictionary by ID."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the dictionary.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DictionaryResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Dictionary not found.",
+                    content = @Content)
+    })
     public ResponseEntity<DictionaryResponse> openDictionary(@PathVariable Long id) {
         Dictionary dictionary = dictionaryService.getDictionaryById(id);
         if (dictionary == null) {
@@ -75,6 +107,18 @@ public class DictionaryController {
     }
 
     @PutMapping("{id}")
+    @Operation(
+            summary = "Edit Dictionary",
+            description = "Edit the details of a specific dictionary by ID."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully edited the dictionary.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DictionaryResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request or data is wrong.",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Dictionary not found.",
+                    content = @Content)
+    })
     public ResponseEntity<DictionaryResponse> editDictionary(@PathVariable Long id, @Valid @RequestBody Dictionary requestDictionary) {
         Dictionary dictionary = dictionaryService.getDictionaryById(id);
         if (dictionary == null) {
@@ -96,6 +140,16 @@ public class DictionaryController {
     }
 
     @PutMapping("{id}/{word}-{translatedWord}")
+    @Operation(
+            summary = "Edit Translation",
+            description = "Edit the translation of a word in a dictionary."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully edited the translation.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TranslationResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Translation not found.",
+                    content = @Content)
+    })
     public ResponseEntity<TranslationResponse> editTranslation(
             @PathVariable Long id,
             @PathVariable String word,
@@ -115,6 +169,16 @@ public class DictionaryController {
     }
 
     @PostMapping
+    @Operation(
+            summary = "Create Dictionary",
+            description = "Create a new dictionary with the specified details."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully created the dictionary.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DictionaryResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request or language name is wrong.",
+                    content = @Content)
+    })
     public ResponseEntity<DictionaryResponse> createDictionary(@Valid @RequestBody Dictionary requestDictionary) {
         if (languageService.findByCode(requestDictionary.getLanguage1().getCode()) == null) {
             languageService.saveLanguage(requestDictionary.getLanguage1());
@@ -149,7 +213,17 @@ public class DictionaryController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<DictionaryResponse> deleteLanguage(@PathVariable Long id) {
+    @Operation(
+            summary = "Delete Dictionary",
+            description = "Delete a dictionary by ID."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deleted the dictionary.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DictionaryResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Dictionary not found.",
+                    content = @Content)
+    })
+    public ResponseEntity<DictionaryResponse> deleteDictionary(@PathVariable Long id) {
         Dictionary dictionary = dictionaryService.deleteDictionaryById(id);
 
         if (dictionary == null) {
@@ -163,6 +237,16 @@ public class DictionaryController {
     }
 
     @PostMapping("{id}")
+    @Operation(
+            summary = "Create Translation",
+            description = "Create a new translation for a word in a dictionary."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully created the translation.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TranslationResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request or dictionary not found.",
+                    content = @Content)
+    })
     public ResponseEntity<TranslationResponse> createTranslation(
             @PathVariable Long id,
             @Valid @RequestBody TranslationRequest translationRequest
@@ -185,6 +269,16 @@ public class DictionaryController {
     }
 
     @GetMapping("{id}/{word}")
+    @Operation(
+            summary = "Search Translation",
+            description = "Search for the translation of a word in a dictionary."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the translation.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TranslationResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Translation not found.",
+                    content = @Content)
+    })
     public ResponseEntity<TranslationResponse> searchTranslation(
             @PathVariable Long id,
             @PathVariable String word
