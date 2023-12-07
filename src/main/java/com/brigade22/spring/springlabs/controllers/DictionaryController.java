@@ -11,17 +11,22 @@ import com.brigade22.spring.springlabs.services.DictionaryService;
 import com.brigade22.spring.springlabs.services.LanguageService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/dictionaries")
+@Validated
 public class DictionaryController {
 
     private final DictionaryService dictionaryService;
@@ -33,8 +38,27 @@ public class DictionaryController {
     }
 
     @GetMapping
-    public ResponseEntity<GetDictionariesResponse> getDictionaries() {
-        return ResponseEntity.ok(new GetDictionariesResponse(dictionaryService.getAll()));
+    @Valid
+    public ResponseEntity<GetDictionariesResponse> getDictionaries(
+            @RequestParam(name = "code", required = false) @NotBlank String code,
+            @RequestParam(name = "page", defaultValue = "0") @PositiveOrZero int page,
+            @RequestParam(name = "size", defaultValue = "10") @Positive int size) {
+
+        List<Dictionary> filteredDictionaries = dictionaryService.getAll();
+
+        if (code != null && !code.isBlank()) {
+            filteredDictionaries = filteredDictionaries.stream()
+                    .filter((dictionary -> dictionary.getLanguage1().getCode().equals(code) ||
+                            dictionary.getLanguage2().getCode().equals(code)))
+                    .collect(Collectors.toList());
+        }
+
+        int startIndex = page * size;
+        int endIndex = Math.min(startIndex + size, filteredDictionaries.size());
+
+        List<Dictionary> paginatedDictionaries = filteredDictionaries.subList(startIndex, endIndex);
+
+        return ResponseEntity.ok(new GetDictionariesResponse(paginatedDictionaries));
     }
 
     @GetMapping("{id}")
@@ -166,6 +190,13 @@ public class DictionaryController {
             @PathVariable String word
     ) {
         Word result = dictionaryService.getTranslationForWord(id, word);
+
+        if (result == null) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Translation not found"
+            );
+        }
 
         return ResponseEntity.ok(new TranslationResponse(word, result.getValue()));
     }

@@ -9,6 +9,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DictionaryService {
@@ -40,15 +41,16 @@ public class DictionaryService {
 
     public Word getTranslationForWord(Long id, String word) {
         List<Translation> translations = this.getDictionaryById(id).getTranslations();
-        return translations.stream()
-            .filter((translation -> translation
-                .getWord()
-                .getValue()
-                .contentEquals(word)
-            ))
-            .toList()
-            .get(0)
-            .getTranslatedWord();
+
+        Optional<Word> matchingTranslation = translations.stream()
+                .filter(translation -> translation
+                        .getWord()
+                        .getValue()
+                        .contentEquals(word))
+                .map(Translation::getTranslatedWord)
+                .findFirst();
+
+        return matchingTranslation.orElse(null);
     }
 
     public void addTranslation(Long id, String word1, String word2) {
