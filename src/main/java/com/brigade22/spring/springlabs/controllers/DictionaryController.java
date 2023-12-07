@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.http.ResponseEntity;
@@ -59,10 +58,9 @@ public class DictionaryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved dictionaries.",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetDictionariesResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid request parameters.")
     })
     public ResponseEntity<GetDictionariesResponse> getDictionaries(
-            @RequestParam(name = "code", required = false) @NotBlank String code,
+            @RequestParam(name = "code", required = false) String code,
             @RequestParam(name = "page", defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(name = "size", defaultValue = "10") @Positive int size) {
 
