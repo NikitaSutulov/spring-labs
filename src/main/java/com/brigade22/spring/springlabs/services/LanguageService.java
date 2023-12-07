@@ -15,15 +15,9 @@ public class LanguageService {
         this.languageRepository = languageRepository;
     }
 
-    public void saveLanguage (Language language) {
-        Language existing = languageRepository.findByCode(language.getCode().toLowerCase());
-
-        if (existing != null) {
-            return;
-        }
-
+    public Language saveLanguage (Language language) {
         language.setCode(language.getCode().toLowerCase());
-        languageRepository.save(language);
+        return languageRepository.save(language);
     }
 
     public List<Language> getAll() {
@@ -34,24 +28,28 @@ public class LanguageService {
         languageRepository.delete(code);
     }
 
-    public void deleteByCode(String code) {
-        languageRepository.deleteByCode(code);
+    public Language deleteByCode(String code) {
+        return languageRepository.deleteByCode(code);
     }
 
     public Language findByCode(String code) {
         return languageRepository.findByCode(code); // Delegate to the repository's findByCode method
     }
 
+    public Language findByName(String name) {
+        return languageRepository.findByName(name);
+    }
 
-
-    public void updateLanguage(String code, Language language) {
+    public Language updateLanguage(String code, Language language) {
         Language existing = languageRepository.findByCode(code);
         if (existing != null) {
             existing.setCode(language.getCode().toLowerCase());
             existing.setName(language.getName());
-        } else {
-            languageRepository.save(language);
+
+            return existing;
         }
+
+        return languageRepository.save(language);
     }
 
     @PostConstruct
