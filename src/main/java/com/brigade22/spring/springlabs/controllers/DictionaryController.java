@@ -148,6 +148,8 @@ public class DictionaryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully edited the translation.",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = TranslationResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request.",
+                    content = @Content),
             @ApiResponse(responseCode = "404", description = "Translation not found.",
                     content = @Content)
     })
