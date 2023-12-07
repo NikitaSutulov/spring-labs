@@ -291,11 +291,22 @@ public class DictionaryController {
     }
 
     private void checkIfLanguageExists(DictionaryRequest requestDictionary) {
-        if (languageService.findByName(requestDictionary.getLanguage1().getName()) != null
-                || languageService.findByName(requestDictionary.getLanguage2().getName()) != null) {
+        Language possibleLanguage1 = languageService.findByName(requestDictionary.getLanguage1().getName());
+
+        if (possibleLanguage1 != null && !Objects.equals(possibleLanguage1.getCode(), requestDictionary.getLanguage1().getCode())) {
             throw new ResponseStatusException(
                     org.springframework.http.HttpStatus.BAD_REQUEST,
-                    "Language with such a name already exists");
+                    "Language code is wrong"
+            );
+        }
+
+        Language possibleLanguage2 = languageService.findByName(requestDictionary.getLanguage2().getName());
+
+        if (possibleLanguage2 != null && !Objects.equals(possibleLanguage2.getCode(), requestDictionary.getLanguage2().getCode())) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Language code is wrong"
+            );
         }
 
         if (languageService.findByCode(requestDictionary.getLanguage1().getCode()) == null) {
