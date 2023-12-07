@@ -285,6 +285,14 @@ public class DictionaryController {
             @PathVariable Long id,
             @PathVariable String word
     ) {
+        if (dictionaryService.getDictionaryById(id) == null) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Dictionary not found"
+            );
+        }
+
+
         Word result = dictionaryService.getTranslationForWord(id, word);
 
         if (result == null) {
