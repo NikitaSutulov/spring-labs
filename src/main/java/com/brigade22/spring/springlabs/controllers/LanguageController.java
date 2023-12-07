@@ -125,7 +125,24 @@ public class LanguageController {
             @PathVariable String code,
             @Valid @RequestBody Language languageDto) {
 
-        if (languageService.findByName(languageDto.getName()) != null) {
+        if (languageService.findByCode(code) == null) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Language is not found"
+            );
+        }
+
+        if (languageService.findByCode(languageDto.getCode()) != null &&
+                !languageDto.getCode().equals(code) &&
+                languageService.findByCode(languageDto.getCode()).getCode().equals(languageDto.getCode())) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Language with such a code already exists"
+            );
+        }
+
+        if (languageService.findByName(languageDto.getName()) != null &&
+                !languageService.findByName(languageDto.getName()).getCode().equals(code)) {
             throw new ResponseStatusException(
                     org.springframework.http.HttpStatus.BAD_REQUEST,
                     "Language with such a name already exists"
