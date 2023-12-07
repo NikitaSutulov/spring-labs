@@ -1,5 +1,6 @@
 package com.brigade22.spring.springlabs.controllers;
 
+import com.brigade22.spring.springlabs.controllers.requests.DictionaryRequest;
 import com.brigade22.spring.springlabs.controllers.requests.TranslationRequest;
 import com.brigade22.spring.springlabs.controllers.responses.DictionaryResponse;
 import com.brigade22.spring.springlabs.controllers.responses.GetDictionariesResponse;
@@ -117,7 +118,7 @@ public class DictionaryController {
             @ApiResponse(responseCode = "404", description = "Dictionary not found.",
                     content = @Content)
     })
-    public ResponseEntity<DictionaryResponse> editDictionary(@PathVariable Long id, @Valid @RequestBody Dictionary requestDictionary) {
+    public ResponseEntity<DictionaryResponse> editDictionary(@PathVariable Long id, @Valid @RequestBody DictionaryRequest requestDictionary) {
         checkIfLanguageExists(requestDictionary);
 
         Dictionary dictionary = dictionaryService.getDictionaryById(id);
@@ -179,7 +180,7 @@ public class DictionaryController {
             @ApiResponse(responseCode = "400", description = "Invalid request or language name is wrong.",
                     content = @Content)
     })
-    public ResponseEntity<DictionaryResponse> createDictionary(@Valid @RequestBody Dictionary requestDictionary) {
+    public ResponseEntity<DictionaryResponse> createDictionary(@Valid @RequestBody DictionaryRequest requestDictionary) {
         checkIfLanguageExists(requestDictionary);
 
         Language language1 = languageService.findByCode(requestDictionary.getLanguage1().getCode());
@@ -287,7 +288,7 @@ public class DictionaryController {
         return ResponseEntity.ok(new TranslationResponse(word, result.getValue()));
     }
 
-    private void checkIfLanguageExists(Dictionary requestDictionary) {
+    private void checkIfLanguageExists(DictionaryRequest requestDictionary) {
         if (languageService.findByName(requestDictionary.getLanguage1().getName()) != null
                 || languageService.findByName(requestDictionary.getLanguage2().getName()) != null) {
             throw new ResponseStatusException(
