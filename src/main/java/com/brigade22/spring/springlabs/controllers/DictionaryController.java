@@ -118,6 +118,8 @@ public class DictionaryController {
                     content = @Content)
     })
     public ResponseEntity<DictionaryResponse> editDictionary(@PathVariable Long id, @Valid @RequestBody Dictionary requestDictionary) {
+        checkIfLanguageExists(requestDictionary);
+
         Dictionary dictionary = dictionaryService.getDictionaryById(id);
         if (dictionary == null) {
             throw new ResponseStatusException(
@@ -178,21 +180,10 @@ public class DictionaryController {
                     content = @Content)
     })
     public ResponseEntity<DictionaryResponse> createDictionary(@Valid @RequestBody Dictionary requestDictionary) {
-        if (languageService.findByCode(requestDictionary.getLanguage1().getCode()) == null) {
-            languageService.saveLanguage(requestDictionary.getLanguage1());
-        }
-        Language language1 = languageService.findByCode(requestDictionary.getLanguage1().getCode());
-        if (languageService.findByCode(requestDictionary.getLanguage2().getCode()) == null) {
-            languageService.saveLanguage(requestDictionary.getLanguage2());
-        }
-        Language language2 = languageService.findByCode(requestDictionary.getLanguage2().getCode());
+        checkIfLanguageExists(requestDictionary);
 
-        if (!Objects.equals(requestDictionary.getLanguage1().getName(), language1.getName()) || !Objects.equals(requestDictionary.getLanguage2().getName(), language2.getName())) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.BAD_REQUEST,
-                    "Language name is wrong"
-            );
-        }
+        Language language1 = languageService.findByCode(requestDictionary.getLanguage1().getCode());
+        Language language2 = languageService.findByCode(requestDictionary.getLanguage2().getCode());
 
         Dictionary dictionary = new Dictionary(
                 requestDictionary.getName(),
@@ -294,5 +285,30 @@ public class DictionaryController {
         }
 
         return ResponseEntity.ok(new TranslationResponse(word, result.getValue()));
+    }
+
+    private void checkIfLanguageExists(Dictionary requestDictionary) {
+        if (languageService.findByName(requestDictionary.getLanguage1().getName()) != null
+                || languageService.findByName(requestDictionary.getLanguage2().getName()) != null) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Language with such a name already exists");
+        }
+
+        if (languageService.findByCode(requestDictionary.getLanguage1().getCode()) == null) {
+            languageService.saveLanguage(requestDictionary.getLanguage1());
+        }
+        Language language1 = languageService.findByCode(requestDictionary.getLanguage1().getCode());
+        if (languageService.findByCode(requestDictionary.getLanguage2().getCode()) == null) {
+            languageService.saveLanguage(requestDictionary.getLanguage2());
+        }
+        Language language2 = languageService.findByCode(requestDictionary.getLanguage2().getCode());
+
+        if (!Objects.equals(requestDictionary.getLanguage1().getName(), language1.getName()) || !Objects.equals(requestDictionary.getLanguage2().getName(), language2.getName())) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Language name is wrong"
+            );
+        }
     }
 }
