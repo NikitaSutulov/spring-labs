@@ -119,7 +119,7 @@ public class DictionaryController {
                     content = @Content)
     })
     public ResponseEntity<DictionaryResponse> editDictionary(@PathVariable Long id, @Valid @RequestBody DictionaryRequest requestDictionary) {
-        checkIfLanguageExists(requestDictionary);
+        languageService.checkIfLanguageExists(requestDictionary);
 
         Dictionary dictionary = dictionaryService.getDictionaryById(id);
         if (dictionary == null) {
@@ -190,7 +190,7 @@ public class DictionaryController {
                     content = @Content)
     })
     public ResponseEntity<DictionaryResponse> createDictionary(@Valid @RequestBody DictionaryRequest requestDictionary) {
-        checkIfLanguageExists(requestDictionary);
+        languageService.checkIfLanguageExists(requestDictionary);
 
         Language language1 = languageService.findByCode(requestDictionary.getLanguage1().getCode());
         Language language2 = languageService.findByCode(requestDictionary.getLanguage2().getCode());
@@ -295,41 +295,5 @@ public class DictionaryController {
         }
 
         return ResponseEntity.ok(new TranslationResponse(word, result.getValue()));
-    }
-
-    private void checkIfLanguageExists(DictionaryRequest requestDictionary) {
-        Language possibleLanguage1 = languageService.findByName(requestDictionary.getLanguage1().getName());
-
-        if (possibleLanguage1 != null && !Objects.equals(possibleLanguage1.getCode(), requestDictionary.getLanguage1().getCode())) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.BAD_REQUEST,
-                    "Language code is wrong"
-            );
-        }
-
-        Language possibleLanguage2 = languageService.findByName(requestDictionary.getLanguage2().getName());
-
-        if (possibleLanguage2 != null && !Objects.equals(possibleLanguage2.getCode(), requestDictionary.getLanguage2().getCode())) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.BAD_REQUEST,
-                    "Language code is wrong"
-            );
-        }
-
-        if (languageService.findByCode(requestDictionary.getLanguage1().getCode()) == null) {
-            languageService.saveLanguage(requestDictionary.getLanguage1());
-        }
-        Language language1 = languageService.findByCode(requestDictionary.getLanguage1().getCode());
-        if (languageService.findByCode(requestDictionary.getLanguage2().getCode()) == null) {
-            languageService.saveLanguage(requestDictionary.getLanguage2());
-        }
-        Language language2 = languageService.findByCode(requestDictionary.getLanguage2().getCode());
-
-        if (!Objects.equals(requestDictionary.getLanguage1().getName(), language1.getName()) || !Objects.equals(requestDictionary.getLanguage2().getName(), language2.getName())) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.BAD_REQUEST,
-                    "Language name is wrong"
-            );
-        }
     }
 }
