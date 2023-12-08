@@ -12,7 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 		info = @Info(
 				title = "Brigade 22 online dictionary",
 				contact = @Contact(
-						name = "Nikita Sutulov, Olexandr Nazarenko, Svyatoslav Shesterov, Svitlana Barytska",
+						name = "Nikita Sutulov, Olexandr Nazarenko, Sviatoslav Shesterov, Svitlana Barytska",
 						email = "notsid212@gmail.com"
 				),
 				description = "This is a RESTful service written on Spring framework by brigade 22, which is an online dictionary.",
