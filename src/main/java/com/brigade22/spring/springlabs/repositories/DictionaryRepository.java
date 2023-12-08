@@ -3,7 +3,6 @@ package com.brigade22.spring.springlabs.repositories;
 import com.brigade22.spring.springlabs.entities.Dictionary;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
