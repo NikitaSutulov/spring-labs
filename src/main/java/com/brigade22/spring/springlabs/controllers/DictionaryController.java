@@ -27,6 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,6 +76,10 @@ public class DictionaryController {
 
         int startIndex = page * size;
         int endIndex = Math.min(startIndex + size, filteredDictionaries.size());
+
+        if (startIndex > endIndex) {
+            return ResponseEntity.ok(new GetDictionariesResponse(new ArrayList<>()));
+        }
 
         List<Dictionary> paginatedDictionaries = filteredDictionaries.subList(startIndex, endIndex);
 
