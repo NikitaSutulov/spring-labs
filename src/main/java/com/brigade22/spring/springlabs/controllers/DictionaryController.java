@@ -8,7 +8,6 @@ import com.brigade22.spring.springlabs.controllers.responses.TranslationResponse
 import com.brigade22.spring.springlabs.entities.Dictionary;
 import com.brigade22.spring.springlabs.entities.Language;
 import com.brigade22.spring.springlabs.entities.Translation;
-import com.brigade22.spring.springlabs.entities.Word;
 import com.brigade22.spring.springlabs.exceptions.ResourceNotFoundException;
 import com.brigade22.spring.springlabs.services.DictionaryService;
 import com.brigade22.spring.springlabs.services.LanguageService;
@@ -159,7 +158,14 @@ public class DictionaryController {
                     content = @Content)
     })
     public ResponseEntity<DictionaryResponse> editDictionary(@PathVariable int id, @Valid @RequestBody DictionaryRequest requestDictionary) {
-        languageService.checkIfLanguageExists(requestDictionary);
+        try {
+            languageService.checkIfLanguageExists(requestDictionary);
+        } catch (ResourceNotFoundException e) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Language name is wrong"
+            );
+        }
 
         checkIfDictionaryExists(id);
 
