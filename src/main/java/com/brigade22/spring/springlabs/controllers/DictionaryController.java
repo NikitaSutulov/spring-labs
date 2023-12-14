@@ -7,6 +7,7 @@ import com.brigade22.spring.springlabs.controllers.responses.GetDictionariesResp
 import com.brigade22.spring.springlabs.controllers.responses.TranslationResponse;
 import com.brigade22.spring.springlabs.entities.Dictionary;
 import com.brigade22.spring.springlabs.entities.Language;
+import com.brigade22.spring.springlabs.entities.Translation;
 import com.brigade22.spring.springlabs.entities.Word;
 import com.brigade22.spring.springlabs.exceptions.ResourceNotFoundException;
 import com.brigade22.spring.springlabs.services.DictionaryService;
@@ -204,30 +205,22 @@ public class DictionaryController {
                     content = @Content)
     })
     public ResponseEntity<TranslationResponse> createTranslation(
-            @PathVariable Long id,
+            @PathVariable int id,
             @Valid @RequestBody TranslationRequest translationRequest
     ) {
-        if (dictionaryService.getDictionaryById(id) == null) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.NOT_FOUND,
-                    "Dictionary not found"
-            );
-        }
+        checkIfDictionaryExists(id);
 
-        String word = translationRequest.getWord();
-        String translatedWord = translationRequest.getTranslatedWord();
-
-        dictionaryService.addTranslation(id, word, translatedWord);
+        Translation translation = dictionaryService.addTranslation(id, translationRequest.getWord(), translationRequest.getTranslatedWord());
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/" + word + "-" + translatedWord)
+                .path("/" + translationRequest.getWord() + "-" + translationRequest.getTranslatedWord())
                 .buildAndExpand(id, translationRequest.getWord(), translationRequest.getTranslatedWord())
                 .toUri();
 
-        return ResponseEntity.created(location).body(new TranslationResponse(translationRequest.getWord(), translationRequest.getTranslatedWord()));
+        return ResponseEntity.created(location).body(new TranslationResponse(translation.getId(), translation.getWord().getValue(), translation.getTranslatedWord().getValue()));
     }
 
-    @PutMapping("{id}/{word}-{translatedWord}")
+    @PutMapping("{id}/{translationId}")
     @Operation(
             summary = "Edit Translation",
             description = "Edit the translation of a word in a dictionary."
@@ -241,28 +234,21 @@ public class DictionaryController {
                     content = @Content)
     })
     public ResponseEntity<TranslationResponse> editTranslation(
-            @PathVariable Long id,
-            @PathVariable String word,
-            @PathVariable String translatedWord,
+            @PathVariable int id,
+            @PathVariable int translationId,
             @Valid @RequestBody TranslationRequest translation
     ) {
-        if (dictionaryService.getDictionaryById(id) == null) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.NOT_FOUND,
-                    "Dictionary not found"
-            );
-        }
+        checkIfDictionaryExists(id);
 
         try {
-            dictionaryService.updateTranslation(id, word, translatedWord, translation.getWord(), translation.getTranslatedWord());
+            Translation updatedTranslation = dictionaryService.updateTranslation(translationId, translation);
+            return ResponseEntity.ok(new TranslationResponse(updatedTranslation.getId(), updatedTranslation.getWord().getValue(), updatedTranslation.getTranslatedWord().getValue()));
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.NOT_FOUND,
-                    "Translation not found"
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Data is wrong"
             );
         }
-
-        return ResponseEntity.ok(new TranslationResponse(translation.getWord(), translation.getTranslatedWord()));
     }
 
     @DeleteMapping("{id}/{translationId}")
@@ -289,27 +275,21 @@ public class DictionaryController {
                     content = @Content)
     })
     public ResponseEntity<TranslationResponse> searchTranslation(
-            @PathVariable Long id,
+            @PathVariable int id,
             @PathVariable String word
     ) {
-        if (dictionaryService.getDictionaryById(id) == null) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.NOT_FOUND,
-                    "Dictionary not found"
-            );
-        }
+        checkIfDictionaryExists(id);
 
+        Translation translation = dictionaryService.getTranslationForWord(id, word);
 
-        Word result = dictionaryService.getTranslationForWord(id, word);
-
-        if (result == null) {
+        if (translation == null) {
             throw new ResponseStatusException(
                     org.springframework.http.HttpStatus.NOT_FOUND,
                     "Translation not found"
             );
         }
 
-        return ResponseEntity.ok(new TranslationResponse(word, result.getValue()));
+        return ResponseEntity.ok(new TranslationResponse(translation.getId(), translation.getWord().getValue(), translation.getTranslatedWord().getValue()));
     }
 
     private void checkIfDictionaryExists(int id) {
