@@ -7,9 +7,10 @@ import java.util.List;
 
 @Repository
 public interface LanguageRepository {
-    Language save(Language language);
     List<Language> findAll();
-    Language deleteByCode(String code);
+    Language save(Language language);
     Language findByCode(String code);
     Language findByName(String name);
+    Language deleteByCode(String code);
+    Language updateLanguage(Language oldLanguage, Language newLanguage);
 }
