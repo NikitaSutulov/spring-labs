@@ -186,8 +186,8 @@ public class DictionaryController {
             description = "Delete a dictionary by ID."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully deleted the dictionary.",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DictionaryResponse.class))),
+            @ApiResponse(responseCode = "204", description = "Successfully deleted the dictionary.",
+                    content = @Content),
             @ApiResponse(responseCode = "404", description = "Dictionary not found.",
                     content = @Content)
     })
@@ -258,6 +258,16 @@ public class DictionaryController {
     }
 
     @DeleteMapping("{id}/{translationId}")
+    @Operation(
+            summary = "Delete Translation",
+            description = "Delete a translation by ID."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Successfully deleted the translation.",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Translation not found.",
+                    content = @Content)
+    })
     public ResponseEntity<String> deleteTranslation(
             @PathVariable int id,
             @PathVariable int translationId
