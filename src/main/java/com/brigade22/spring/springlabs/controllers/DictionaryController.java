@@ -99,16 +99,49 @@ public class DictionaryController {
             @ApiResponse(responseCode = "404", description = "Dictionary not found.",
                     content = @Content)
     })
-    public ResponseEntity<DictionaryResponse> openDictionary(@PathVariable Long id) {
-        Dictionary dictionary = dictionaryService.getDictionaryById(id);
-        if (dictionary == null) {
+    public ResponseEntity<DictionaryResponse> openDictionary(@PathVariable int id) {
+        try {
+            return ResponseEntity.ok(new DictionaryResponse(dictionaryService.getDictionaryById(id)));
+        } catch (ResourceNotFoundException ex) {
             throw new ResponseStatusException(
                     org.springframework.http.HttpStatus.NOT_FOUND,
-                    "Dictionary not found"
+                    "Dictionary not found",
+                    ex
             );
         }
+    }
 
-        return ResponseEntity.ok(new DictionaryResponse(dictionary));
+    @PostMapping
+    @Operation(
+            summary = "Create Dictionary",
+            description = "Create a new dictionary with the specified details."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully created the dictionary.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DictionaryResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request or language name is wrong.",
+                    content = @Content)
+    })
+    public ResponseEntity<DictionaryResponse> createDictionary(@Valid @RequestBody DictionaryRequest requestDictionary) {
+        languageService.checkIfLanguageExists(requestDictionary);
+
+        Language language1 = languageService.findByCode(requestDictionary.getLanguage1().getCode());
+        Language language2 = languageService.findByCode(requestDictionary.getLanguage2().getCode());
+
+        Dictionary dictionary = new Dictionary(
+                requestDictionary.getName(),
+                language1,
+                language2
+        );
+
+        dictionary = dictionaryService.saveDictionary(dictionary);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(dictionary.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(new DictionaryResponse(dictionary));
     }
 
     @PutMapping("{id}")
@@ -124,16 +157,10 @@ public class DictionaryController {
             @ApiResponse(responseCode = "404", description = "Dictionary not found.",
                     content = @Content)
     })
-    public ResponseEntity<DictionaryResponse> editDictionary(@PathVariable Long id, @Valid @RequestBody DictionaryRequest requestDictionary) {
+    public ResponseEntity<DictionaryResponse> editDictionary(@PathVariable int id, @Valid @RequestBody DictionaryRequest requestDictionary) {
         languageService.checkIfLanguageExists(requestDictionary);
 
-        Dictionary dictionary = dictionaryService.getDictionaryById(id);
-        if (dictionary == null) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.NOT_FOUND,
-                    "Dictionary not found"
-            );
-        }
+        checkIfDictionaryExists(id);
 
         try {
             Dictionary changedDictionary = dictionaryService.updateDictionary(id, requestDictionary.getName(), requestDictionary.getLanguage1(), requestDictionary.getLanguage2());
@@ -144,6 +171,60 @@ public class DictionaryController {
                     "Data is wrong"
             );
         }
+    }
+
+    @DeleteMapping("{id}")
+    @Operation(
+            summary = "Delete Dictionary",
+            description = "Delete a dictionary by ID."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deleted the dictionary.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DictionaryResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Dictionary not found.",
+                    content = @Content)
+    })
+    public ResponseEntity<String> deleteDictionary(@PathVariable int id) {
+        checkIfDictionaryExists(id);
+
+        dictionaryService.deleteDictionaryById(id);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("{id}")
+    @Operation(
+            summary = "Create Translation",
+            description = "Create a new translation for a word in a dictionary."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully created the translation.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TranslationResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request or dictionary not found.",
+                    content = @Content)
+    })
+    public ResponseEntity<TranslationResponse> createTranslation(
+            @PathVariable Long id,
+            @Valid @RequestBody TranslationRequest translationRequest
+    ) {
+        if (dictionaryService.getDictionaryById(id) == null) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Dictionary not found"
+            );
+        }
+
+        String word = translationRequest.getWord();
+        String translatedWord = translationRequest.getTranslatedWord();
+
+        dictionaryService.addTranslation(id, word, translatedWord);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/" + word + "-" + translatedWord)
+                .buildAndExpand(id, translationRequest.getWord(), translationRequest.getTranslatedWord())
+                .toUri();
+
+        return ResponseEntity.created(location).body(new TranslationResponse(translationRequest.getWord(), translationRequest.getTranslatedWord()));
     }
 
     @PutMapping("{id}/{word}-{translatedWord}")
@@ -182,98 +263,6 @@ public class DictionaryController {
         }
 
         return ResponseEntity.ok(new TranslationResponse(translation.getWord(), translation.getTranslatedWord()));
-    }
-
-    @PostMapping
-    @Operation(
-            summary = "Create Dictionary",
-            description = "Create a new dictionary with the specified details."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successfully created the dictionary.",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DictionaryResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid request or language name is wrong.",
-                    content = @Content)
-    })
-    public ResponseEntity<DictionaryResponse> createDictionary(@Valid @RequestBody DictionaryRequest requestDictionary) {
-        languageService.checkIfLanguageExists(requestDictionary);
-
-        Language language1 = languageService.findByCode(requestDictionary.getLanguage1().getCode());
-        Language language2 = languageService.findByCode(requestDictionary.getLanguage2().getCode());
-
-        Dictionary dictionary = new Dictionary(
-                requestDictionary.getName(),
-                language1,
-                language2
-        );
-
-        dictionary = dictionaryService.saveDictionary(dictionary);
-
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(dictionary.getId())
-                .toUri();
-
-        return ResponseEntity.created(location).body(new DictionaryResponse(dictionary));
-    }
-
-    @DeleteMapping("{id}")
-    @Operation(
-            summary = "Delete Dictionary",
-            description = "Delete a dictionary by ID."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully deleted the dictionary.",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DictionaryResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Dictionary not found.",
-                    content = @Content)
-    })
-    public ResponseEntity<DictionaryResponse> deleteDictionary(@PathVariable Long id) {
-        Dictionary dictionary = dictionaryService.deleteDictionaryById(id);
-
-        if (dictionary == null) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.NOT_FOUND,
-                    "Dictionary not found"
-            );
-        }
-
-        return ResponseEntity.ok(new DictionaryResponse(dictionary));
-    }
-
-    @PostMapping("{id}")
-    @Operation(
-            summary = "Create Translation",
-            description = "Create a new translation for a word in a dictionary."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Successfully created the translation.",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TranslationResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid request or dictionary not found.",
-                    content = @Content)
-    })
-    public ResponseEntity<TranslationResponse> createTranslation(
-            @PathVariable Long id,
-            @Valid @RequestBody TranslationRequest translationRequest
-    ) {
-        if (dictionaryService.getDictionaryById(id) == null) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.NOT_FOUND,
-                    "Dictionary not found"
-            );
-        }
-
-        String word = translationRequest.getWord();
-        String translatedWord = translationRequest.getTranslatedWord();
-
-        dictionaryService.addTranslation(id, word, translatedWord);
-
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/" + word + "-" + translatedWord)
-                .buildAndExpand(id, translationRequest.getWord(), translationRequest.getTranslatedWord())
-                .toUri();
-
-        return ResponseEntity.created(location).body(new TranslationResponse(translationRequest.getWord(), translationRequest.getTranslatedWord()));
     }
 
     @DeleteMapping("{id}/{translationId}")
