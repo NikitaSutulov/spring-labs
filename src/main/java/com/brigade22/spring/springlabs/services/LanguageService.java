@@ -2,8 +2,9 @@ package com.brigade22.spring.springlabs.services;
 
 import com.brigade22.spring.springlabs.controllers.requests.DictionaryRequest;
 import com.brigade22.spring.springlabs.entities.Language;
+import com.brigade22.spring.springlabs.exceptions.ResourceNotFoundException;
 import com.brigade22.spring.springlabs.repositories.LanguageRepository;
-import jakarta.annotation.PostConstruct;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,6 +20,9 @@ public class LanguageService {
     }
 
     public Language saveLanguage (Language language) {
+        validateUniqueCode(language.getCode());
+        validateUniqueName(language.getName());
+
         language.setCode(language.getCode().toLowerCase());
         return languageRepository.save(language);
     }
@@ -39,16 +43,10 @@ public class LanguageService {
         return languageRepository.findByName(name);
     }
 
-    public Language updateLanguage(String code, Language language) {
-        Language existing = languageRepository.findByCode(code);
-        if (existing != null) {
-            existing.setCode(language.getCode().toLowerCase());
-            existing.setName(language.getName());
+    public Language updateLanguage(Language existingLanguage, Language newLanguage) {
+        validateCodeAndNameForUpdate(existingLanguage, newLanguage);
 
-            return existing;
-        }
-
-        return languageRepository.save(language);
+        return languageRepository.updateLanguage(existingLanguage, newLanguage);
     }
 
     public void checkIfLanguageExists(DictionaryRequest requestDictionary) {
@@ -87,14 +85,38 @@ public class LanguageService {
         }
     }
 
-    @PostConstruct
-    public void initializeSampleData() {
-        Language language1 = new Language("en", "English");
-        Language language2 = new Language("ua", "Ukrainian");
-        Language language3 = new Language("pl", "Polish");
+    private void validateCodeAndNameForUpdate(Language existingLanguage, Language updatedLanguage) {
+        // If code is changed, check if the new code is available
+        if (!existingLanguage.getCode().equals(updatedLanguage.getCode())) {
+            validateUniqueCode(updatedLanguage.getCode());
+        }
 
-        languageRepository.save(language1);
-        languageRepository.save(language2);
-        languageRepository.save(language3);
+        // If name is changed, check if the new name is available
+        if (!existingLanguage.getName().equals(updatedLanguage.getName())) {
+            validateUniqueName(updatedLanguage.getName());
+        }
     }
+
+    private void validateUniqueCode(String code) {
+        try {
+            if (findByCode(code) != null) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Language with such a code already exists"
+                );
+            }
+        } catch (ResourceNotFoundException ignored) {}
+    }
+
+    private void validateUniqueName(String name) {
+        try {
+            if (findByName(name) != null) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Language with such a name already exists"
+                );
+            }
+        } catch (ResourceNotFoundException ignored) {}
+    }
+
 }
