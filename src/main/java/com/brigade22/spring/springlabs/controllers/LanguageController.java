@@ -1,6 +1,7 @@
 package com.brigade22.spring.springlabs.controllers;
 
 import com.brigade22.spring.springlabs.entities.Language;
+import com.brigade22.spring.springlabs.exceptions.ResourceNotFoundException;
 import com.brigade22.spring.springlabs.services.LanguageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -56,16 +58,16 @@ public class LanguageController {
             @ApiResponse(responseCode = "404", description = "Language not found.", content = @Content)
     })
     public ResponseEntity<Language> findLanguage(@PathVariable String code) {
-        Language language = languageService.findByCode(code);
-
-        if (language == null) {
+        try {
+            Language language = languageService.findByCode(code);
+            return ResponseEntity.ok(language);
+        } catch (ResourceNotFoundException ex) {
             throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.NOT_FOUND,
-                    "Language is not found"
+                    HttpStatus.NOT_FOUND,
+                    "Language is not found",
+                    ex
             );
         }
-
-        return ResponseEntity.ok(language);
     }
 
     @PostMapping
@@ -82,21 +84,8 @@ public class LanguageController {
             @ApiResponse(responseCode = "400", description = "Invalid request or language already exists.", content = @Content)
     })
     public ResponseEntity<Language> createLanguage(@Valid @RequestBody Language languageDto) {
-        if (languageService.findByCode(languageDto.getCode()) != null) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.BAD_REQUEST,
-                    "Language with such a code already exists"
-            );
-        }
-
-        if (languageService.findByName(languageDto.getName()) != null) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.BAD_REQUEST,
-                    "Language with such a name already exists"
-            );
-        }
-
         Language language = new Language(languageDto.getCode(), languageDto.getName());
+
         language = languageService.saveLanguage(language);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -125,33 +114,19 @@ public class LanguageController {
             @PathVariable String code,
             @Valid @RequestBody Language languageDto) {
 
-        if (languageService.findByCode(code) == null) {
+        try {
+            Language existingLanguage = languageService.findByCode(code);
+
+            Language language = languageService.updateLanguage(existingLanguage, languageDto);
+
+            return ResponseEntity.ok(language);
+        } catch (ResourceNotFoundException ex) {
             throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.NOT_FOUND,
-                    "Language is not found"
+                    HttpStatus.NOT_FOUND,
+                    "Language is not found",
+                    ex
             );
         }
-
-        if (languageService.findByCode(languageDto.getCode()) != null &&
-                !languageDto.getCode().equals(code) &&
-                languageService.findByCode(languageDto.getCode()).getCode().equals(languageDto.getCode())) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.BAD_REQUEST,
-                    "Language with such a code already exists"
-            );
-        }
-
-        if (languageService.findByName(languageDto.getName()) != null &&
-                !languageService.findByName(languageDto.getName()).getCode().equals(code)) {
-            throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.BAD_REQUEST,
-                    "Language with such a name already exists"
-            );
-        }
-
-        Language language = languageService.updateLanguage(code, languageDto);
-
-        return ResponseEntity.ok(language);
     }
 
     @DeleteMapping("/{code}")
@@ -168,14 +143,15 @@ public class LanguageController {
             @ApiResponse(responseCode = "404", description = "Language not found.", content = @Content)
     })
     public ResponseEntity<Language> deleteLanguage(@PathVariable String code) {
-        Language language = languageService.deleteByCode(code);
-        if (language == null) {
+        try {
+            Language language = languageService.deleteByCode(code);
+            return ResponseEntity.ok(language);
+        } catch (ResourceNotFoundException ex) {
             throw new ResponseStatusException(
-                    org.springframework.http.HttpStatus.NOT_FOUND,
-                    "Language is not found"
+                    HttpStatus.NOT_FOUND,
+                    "Language is not found",
+                    ex
             );
         }
-
-        return ResponseEntity.ok(language);
     }
 }
