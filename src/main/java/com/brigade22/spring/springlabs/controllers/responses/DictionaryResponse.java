@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DictionaryResponse {
-    private Long id;
+    private int id;
     private String name;
     private String language;
     private String translatedLanguage;
     private List<TranslationResponse> translations;
 
-    public DictionaryResponse(Long id, String name, String language, String translatedLanguage, List<TranslationResponse> translations) {
+    public DictionaryResponse(int id, String name, String language, String translatedLanguage, List<TranslationResponse> translations) {
         this.id = id;
         this.name = name;
         this.language = language;
@@ -24,7 +24,7 @@ public class DictionaryResponse {
     public DictionaryResponse(Dictionary dictionary) {
         List<TranslationResponse> translations = new ArrayList<>();
         for (Translation translation : dictionary.getTranslations()) {
-            translations.add(new TranslationResponse(translation.getWord().getValue(), translation.getTranslatedWord().getValue()));
+            translations.add(new TranslationResponse(translation.getId(), translation.getWord().getValue(), translation.getTranslatedWord().getValue()));
         }
         this.id = dictionary.getId();
         this.name = dictionary.getName();
@@ -33,7 +33,7 @@ public class DictionaryResponse {
         this.translations = translations;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
     public List<TranslationResponse> getTranslations() {

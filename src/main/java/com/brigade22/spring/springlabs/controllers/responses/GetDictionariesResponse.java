@@ -15,7 +15,7 @@ public class GetDictionariesResponse {
         for (Dictionary dictionary : dictionaries) {
             List<TranslationResponse> translations = new ArrayList<>();
             for (Translation translation : dictionary.getTranslations()) {
-                translations.add(new TranslationResponse(translation.getWord().getValue(), translation.getTranslatedWord().getValue()));
+                translations.add(new TranslationResponse(translation.getId(), translation.getWord().getValue(), translation.getTranslatedWord().getValue()));
             }
             this.dictionaries.add(new DictionaryResponse(dictionary.getId(), dictionary.getName(), dictionary.getLanguage1().getCode(), dictionary.getLanguage2().getCode(), translations));
         }
