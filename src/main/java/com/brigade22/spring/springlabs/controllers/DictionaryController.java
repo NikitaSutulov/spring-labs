@@ -8,6 +8,7 @@ import com.brigade22.spring.springlabs.controllers.responses.TranslationResponse
 import com.brigade22.spring.springlabs.entities.Dictionary;
 import com.brigade22.spring.springlabs.entities.Language;
 import com.brigade22.spring.springlabs.entities.Word;
+import com.brigade22.spring.springlabs.exceptions.ResourceNotFoundException;
 import com.brigade22.spring.springlabs.services.DictionaryService;
 import com.brigade22.spring.springlabs.services.LanguageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -274,6 +276,18 @@ public class DictionaryController {
         return ResponseEntity.created(location).body(new TranslationResponse(translationRequest.getWord(), translationRequest.getTranslatedWord()));
     }
 
+    @DeleteMapping("{id}/{translationId}")
+    public ResponseEntity<String> deleteTranslation(
+            @PathVariable int id,
+            @PathVariable int translationId
+    ) {
+        checkIfDictionaryExists(id);
+
+        dictionaryService.deleteTranslationById(translationId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @GetMapping("{id}/{word}")
     @Operation(
             summary = "Search Translation",
@@ -307,5 +321,17 @@ public class DictionaryController {
         }
 
         return ResponseEntity.ok(new TranslationResponse(word, result.getValue()));
+    }
+
+    private void checkIfDictionaryExists(int id) {
+        try {
+            dictionaryService.getDictionaryById(id);
+        } catch (ResourceNotFoundException ex) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Dictionary not found",
+                    ex
+            );
+        }
     }
 }
