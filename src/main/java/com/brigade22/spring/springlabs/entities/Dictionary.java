@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Dictionary {
-    private long id;
+    private int id;
     @NotBlank
     private String name;
 
@@ -28,18 +28,18 @@ public class Dictionary {
         this.language2 = language2;
     }
 
-    public Dictionary(long id, String name, Language language1, Language language2) {
+    public Dictionary(int id, String name, Language language1, Language language2) {
         this.id = id;
         this.name = name;
         this.language1 = language1;
         this.language2 = language2;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

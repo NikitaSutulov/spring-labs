@@ -11,12 +11,10 @@ public interface DictionaryRepository {
     Dictionary save(Dictionary dictionary);
 
     List<Dictionary> findAll();
+    void deleteById(int id);
 
-    void delete(Dictionary dictionary);
-    Dictionary deleteById(long id);
-
-    Dictionary findById(Long id);
+    Dictionary findById(int id);
 
     void clear();
-    Dictionary update(Long id, Dictionary dictionary);
+    Dictionary update(int id, Dictionary dictionary);
 }
