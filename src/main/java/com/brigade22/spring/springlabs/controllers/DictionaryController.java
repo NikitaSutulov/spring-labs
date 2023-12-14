@@ -265,7 +265,7 @@ public class DictionaryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Successfully deleted the translation.",
                     content = @Content),
-            @ApiResponse(responseCode = "404", description = "Translation not found.",
+            @ApiResponse(responseCode = "404", description = "Dictionary not found.",
                     content = @Content)
     })
     public ResponseEntity<String> deleteTranslation(
