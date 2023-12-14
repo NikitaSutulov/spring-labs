@@ -1,13 +1,23 @@
 package com.brigade22.spring.springlabs.entities;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 
 public class Translation {
+    @Getter
+    private int id;
     private Dictionary dictionary;
     @NotNull
     private Word word;
     @NotNull
     private Word translatedWord;
+
+    public Translation(int id, Dictionary dictionary, Word word, Word translatedWord) {
+        this.id = id;
+        this.dictionary = dictionary;
+        this.word = word;
+        this.translatedWord = translatedWord;
+    }
 
     public Translation(Dictionary dictionary, Word word, Word translatedWord) {
         this.dictionary = dictionary;
@@ -41,5 +51,8 @@ public class Translation {
     }
     public void setDictionary(Dictionary dictionary) {
         this.dictionary = dictionary;
+    }
+    public void setId(int id) {
+        this.id = id;
     }
 }
