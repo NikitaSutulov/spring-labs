@@ -111,6 +111,29 @@ public class DictionaryController {
         }
     }
 
+    @GetMapping("open-by-name/{name}")
+    @Operation(
+            summary = "Open Dictionary by name",
+            description = "Get details of a specific dictionary by name."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the dictionary.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DictionaryResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Dictionary not found.",
+                    content = @Content)
+    })
+    public ResponseEntity<DictionaryResponse> openDictionaryByName(@PathVariable String name) {
+        try {
+            return ResponseEntity.ok(new DictionaryResponse(dictionaryService.getDictionaryByName(name)));
+        } catch (ResourceNotFoundException ex) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Dictionary not found",
+                    ex
+            );
+        }
+    }
+
     @PostMapping
     @Operation(
             summary = "Create Dictionary",

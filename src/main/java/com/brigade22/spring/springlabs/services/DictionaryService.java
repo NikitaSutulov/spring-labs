@@ -55,6 +55,15 @@ public class DictionaryService {
         return dictionary;
     }
 
+    public Dictionary getDictionaryByName(String name) {
+        Dictionary dictionary = dictionaryRepository.findByName(name);
+
+        List<Translation> translations = translationRepository.findByDictionaryId(dictionary.getId());
+        dictionary.setTranslations(translations);
+
+        return dictionary;
+    }
+
     public Translation getTranslationForWord(int id, String word) {
         Dictionary dictionary = this.getDictionaryById(id);
 

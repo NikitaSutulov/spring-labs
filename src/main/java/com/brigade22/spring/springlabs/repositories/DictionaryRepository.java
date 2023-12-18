@@ -16,4 +16,6 @@ public interface DictionaryRepository {
     Dictionary findById(int id);
 
     Dictionary update(int id, Dictionary dictionary);
+
+    Dictionary findByName(String name);
 }

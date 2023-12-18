@@ -5,6 +5,7 @@ import com.brigade22.spring.springlabs.entities.Dictionary;
 import com.brigade22.spring.springlabs.entities.Language;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -35,6 +36,11 @@ public class PostgresDictionaryRepository implements DictionaryRepository {
             "WHERE d.id = ?";
     private static final String DELETE_BY_ID = "DELETE FROM dictionary WHERE id = ?";
     private static final String UPDATE_BY_ID = "UPDATE dictionary SET name = ?, language1_code = ?, language2_code = ? WHERE id = ?";
+    private static final String FIND_BY_NAME = "SELECT d.id, d.name, d.language1_code, l1.name as language1_name, d.language2_code, l2.name as language2_name " +
+            "FROM dictionary d " +
+            "JOIN language l1 ON d.language1_code = l1.code " +
+            "JOIN language l2 ON d.language2_code = l2.code " +
+            "WHERE d.name = ?";
 
     private static Dictionary mapRow(ResultSet rs, int rowNum) throws SQLException {
         return new Dictionary(
@@ -75,6 +81,15 @@ public class PostgresDictionaryRepository implements DictionaryRepository {
     public Dictionary update(int id, Dictionary dictionary) {
         executeUpdateAndExtractGeneratedKey(UPDATE_BY_ID, new Object[] { dictionary.getName(), dictionary.getLanguage1().getCode(), dictionary.getLanguage2().getCode(), id }, dictionary);
         return findById(id);
+    }
+
+    @Override
+    public Dictionary findByName(String name) {
+        try {
+            return jdbcTemplate.queryForObject(FIND_BY_NAME, PostgresDictionaryRepository::mapRow, name);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            throw new ResourceNotFoundException("Dictionary with name " + name + " not found");
+        }
     }
 
     private void executeUpdateAndExtractGeneratedKey(String sql, Object[] params, Dictionary dictionary) {
