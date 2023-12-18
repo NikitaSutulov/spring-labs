@@ -3,7 +3,6 @@ package com.brigade22.spring.springlabs.repositories;
 import com.brigade22.spring.springlabs.exceptions.ResourceNotFoundException;
 import com.brigade22.spring.springlabs.entities.Dictionary;
 import com.brigade22.spring.springlabs.entities.Language;
-import com.brigade22.spring.springlabs.entities.Translation;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,7 +14,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -71,11 +69,6 @@ public class PostgresDictionaryRepository implements DictionaryRepository {
         } catch (org.springframework.dao.EmptyResultDataAccessException e) {
             throw new ResourceNotFoundException("Dictionary with id " + id + " not found");
         }
-    }
-
-    @Override
-    public void clear() {
-
     }
 
     @Override

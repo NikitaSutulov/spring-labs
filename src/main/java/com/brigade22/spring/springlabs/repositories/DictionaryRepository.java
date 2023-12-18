@@ -15,6 +15,5 @@ public interface DictionaryRepository {
 
     Dictionary findById(int id);
 
-    void clear();
     Dictionary update(int id, Dictionary dictionary);
 }
