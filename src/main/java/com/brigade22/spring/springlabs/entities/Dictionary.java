@@ -1,22 +1,38 @@
 package com.brigade22.spring.springlabs.entities;
 
+import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Entity
 public class Dictionary {
-    private long id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter
+    private Long id;
+
+    @Setter
     @NotBlank
     private String name;
 
+    @Setter
     @Valid
+    @ManyToOne
     private Language language1;
-    @Valid
 
+    @Setter
+    @Valid
+    @ManyToOne
     private Language language2;
 
+    @OneToMany(mappedBy = "dictionary")
     private final List<Translation> translations = new ArrayList<>();
 
     public Dictionary() {
@@ -35,44 +51,9 @@ public class Dictionary {
         this.language2 = language2;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Translation> getTranslations() {
-        return translations;
-    }
-
-    public void addTranslation(Translation translation) {
+    public Translation addTranslation(Translation translation) {
         this.translations.add(translation);
-    }
-
-    public Language getLanguage1() {
-        return language1;
-    }
-
-    public Language getLanguage2() {
-        return language2;
-    }
-
-    public void setLanguage1(Language language) {
-        this.language1 = language;
-    }
-
-    public void setLanguage2(Language language) {
-        this.language2 = language;
+        return translation;
     }
 
     public void setTranslations(List<Translation> translations) {
