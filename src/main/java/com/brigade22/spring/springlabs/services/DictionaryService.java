@@ -94,6 +94,7 @@ public class DictionaryService {
         return dictionaryRepository.update(id, new Dictionary(id, name, language1, language2));
     }
 
+    @Transactional
     public Translation updateTranslation(int translationId, TranslationRequest translationRequest) {
         Translation existingTranslation = translationRepository.findById(translationId);
 
