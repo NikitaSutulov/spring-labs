@@ -171,9 +171,9 @@ public class LanguageController {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200",
+                    responseCode = "204",
                     description = "Successfully deleted the language.",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Language.class))
+                    content = @Content
             ),
             @ApiResponse(responseCode = "404", description = "Language not found.", content = @Content)
     })
