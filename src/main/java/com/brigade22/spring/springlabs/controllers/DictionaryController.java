@@ -9,6 +9,7 @@ import com.brigade22.spring.springlabs.entities.Dictionary;
 import com.brigade22.spring.springlabs.entities.Language;
 import com.brigade22.spring.springlabs.entities.Translation;
 import com.brigade22.spring.springlabs.entities.Word;
+import com.brigade22.spring.springlabs.exceptions.ResourceNotFoundException;
 import com.brigade22.spring.springlabs.services.DictionaryService;
 import com.brigade22.spring.springlabs.services.LanguageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -42,6 +44,7 @@ public class DictionaryController {
     private final DictionaryService dictionaryService;
     private final LanguageService languageService;
 
+    @Autowired
     public DictionaryController(DictionaryService dictionaryService, LanguageService languageService) {
         this.dictionaryService = dictionaryService;
         this.languageService = languageService;
@@ -125,7 +128,15 @@ public class DictionaryController {
                     content = @Content)
     })
     public ResponseEntity<DictionaryResponse> editDictionary(@PathVariable Long id, @Valid @RequestBody DictionaryRequest requestDictionary) {
-        languageService.checkIfLanguageExists(requestDictionary);
+
+        try {
+            languageService.checkIfLanguagesExist(requestDictionary);
+        } catch (ResourceNotFoundException e) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Language with such name or code doesn't exist"
+            );
+        }
 
         Dictionary dictionary = dictionaryService.getDictionaryById(id);
         if (dictionary == null) {
@@ -194,7 +205,15 @@ public class DictionaryController {
                     content = @Content)
     })
     public ResponseEntity<DictionaryResponse> createDictionary(@Valid @RequestBody DictionaryRequest requestDictionary) {
-        languageService.checkIfLanguageExists(requestDictionary);
+
+        try {
+            languageService.checkIfLanguagesExist(requestDictionary);
+        } catch (ResourceNotFoundException e) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Language with such name or code doesn't exist"
+            );
+        }
 
         Language language1 = languageService.findByCode(requestDictionary.getLanguage1().getCode());
         Language language2 = languageService.findByCode(requestDictionary.getLanguage2().getCode());
@@ -216,27 +235,26 @@ public class DictionaryController {
     }
 
     @DeleteMapping("{id}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @Operation(
             summary = "Delete Dictionary",
             description = "Delete a dictionary by ID."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully deleted the dictionary.",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DictionaryResponse.class))),
+            @ApiResponse(responseCode = "204", description = "Successfully deleted the dictionary.",
+                    content = @Content),
             @ApiResponse(responseCode = "404", description = "Dictionary not found.",
                     content = @Content)
     })
-    public ResponseEntity<DictionaryResponse> deleteDictionary(@PathVariable Long id) {
-        Dictionary dictionary = dictionaryService.deleteDictionaryById(id);
-
-        if (dictionary == null) {
+    public void deleteDictionary(@PathVariable Long id) {
+        if (dictionaryService.getDictionaryById(id) == null) {
             throw new ResponseStatusException(
                     org.springframework.http.HttpStatus.NOT_FOUND,
                     "Dictionary not found"
             );
         }
 
-        return ResponseEntity.ok(new DictionaryResponse(dictionary));
+        dictionaryService.deleteDictionaryById(id);
     }
 
     @PostMapping("{id}")
@@ -281,8 +299,8 @@ public class DictionaryController {
             description = "Delete a translation by ID."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully deleted the translation.",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TranslationResponse.class))),
+            @ApiResponse(responseCode = "204", description = "Successfully deleted the translation.",
+                    content = @Content),
             @ApiResponse(responseCode = "404", description = "Dictionary not found.",
                     content = @Content)
     })
@@ -329,8 +347,7 @@ public class DictionaryController {
             );
         }
 
-
-        Word result = dictionaryService.getTranslationForWord(id, word);
+        Translation result = dictionaryService.getTranslationForWord(id, word);
 
         if (result == null) {
             throw new ResponseStatusException(
@@ -339,6 +356,6 @@ public class DictionaryController {
             );
         }
 
-        return ResponseEntity.ok(new TranslationResponse(word, result.getValue()));
+        return ResponseEntity.ok(new TranslationResponse(result.getId(), result.getWord().getValue(), result.getTranslatedWord().getValue()));
     }
 }
