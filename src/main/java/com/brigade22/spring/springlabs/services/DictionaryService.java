@@ -8,7 +8,6 @@ import com.brigade22.spring.springlabs.entities.Word;
 import com.brigade22.spring.springlabs.repositories.DictionaryRepository;
 import com.brigade22.spring.springlabs.repositories.TranslationRepository;
 import com.brigade22.spring.springlabs.repositories.WordRepository;
-import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,23 +40,20 @@ public class DictionaryService {
         return dictionaries;
     }
 
-    public Dictionary deleteDictionaryById(long id) {
-        return dictionaryRepository.deleteById(id);
+    @Transactional
+    public void deleteDictionaryById(long id) {
+        dictionaryRepository.deleteDictionaryById(id);
     }
 
     public Dictionary getDictionaryById(Long id) {
-        return dictionaryRepository.findById(id);
+        return dictionaryRepository.findDictionaryById(id);
     }
 
-    public Word getTranslationForWord(Long id, String word) {
-        List<Translation> translations = this.getDictionaryById(id).getTranslations();
+    public Translation getTranslationForWord(Long id, String word) {
+        Dictionary dictionary = this.getDictionaryById(id);
 
-        Optional<Word> matchingTranslation = translations.stream()
-                .filter(translation -> translation
-                        .getWord()
-                        .getValue()
-                        .contentEquals(word))
-                .map(Translation::getTranslatedWord)
+        Optional<Translation> matchingTranslation = dictionary.getTranslations().stream()
+                .filter(translation -> translation.getWord().getValue().contentEquals(word))
                 .findFirst();
 
         return matchingTranslation.orElse(null);
@@ -73,8 +69,21 @@ public class DictionaryService {
         return translationRepository.save(new Translation(dictionary, wordInLanguage1, wordInLanguage2));
     }
 
+    @Transactional
     public Dictionary updateDictionary(Long id, String name, Language language1, Language language2) {
-        return dictionaryRepository.update(id, new Dictionary(id, name, language1, language2));
+        // Create a new dictionary object with the updated fields
+        Dictionary updatedDictionary = new Dictionary(id, name, language1, language2);
+
+        Dictionary existingDictionary = dictionaryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Dictionary not found with id: " + id));
+
+        // Update fields of the existing dictionary
+        existingDictionary.setName(updatedDictionary.getName());
+        existingDictionary.setLanguage1(updatedDictionary.getLanguage1());
+        existingDictionary.setLanguage2(updatedDictionary.getLanguage2());
+
+        // Save the updated dictionary back to the database
+        return dictionaryRepository.save(existingDictionary);
     }
 
     @Transactional
