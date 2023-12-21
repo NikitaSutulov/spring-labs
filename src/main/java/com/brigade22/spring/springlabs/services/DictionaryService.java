@@ -125,6 +125,10 @@ public class DictionaryService {
     }
 
     public void deleteTranslationById(int id) {
+        Translation translation = translationRepository.findById(id);
+        if (translation == null) {
+            throw new ResourceNotFoundException("Translation with id " + id + " not found");
+        }
         translationRepository.deleteTranslationById(id);
     }
 }
