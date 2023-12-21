@@ -297,7 +297,7 @@ public class DictionaryController {
     ) {
         checkIfDictionaryExists(id);
 
-        dictionaryService.deleteTranslationById(translationId);
+        dictionaryService.deleteTranslationById(translationId, id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
