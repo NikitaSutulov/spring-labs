@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ public class LanguageController {
 
     private final LanguageService languageService;
 
+    @Autowired
     public LanguageController(LanguageService languageService) {
         this.languageService = languageService;
     }
@@ -150,9 +152,16 @@ public class LanguageController {
             );
         }
 
-        Language language = languageService.updateLanguage(code, languageDto);
-
-        return ResponseEntity.ok(language);
+        try {
+            Language language = languageService.updateLanguage(code, languageDto);
+            return ResponseEntity.ok(language);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Cannot modify the primary key (code) of Language entity.",
+                    e
+            );
+        }
     }
 
     @DeleteMapping("/{code}")
