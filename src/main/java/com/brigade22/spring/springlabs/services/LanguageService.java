@@ -5,10 +5,15 @@ import com.brigade22.spring.springlabs.entities.Language;
 import com.brigade22.spring.springlabs.exceptions.ResourceNotFoundException;
 import com.brigade22.spring.springlabs.repositories.LanguageRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,6 +21,10 @@ import java.util.Objects;
 public class LanguageService {
     private final LanguageRepository languageRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Autowired
     public LanguageService(LanguageRepository languageRepository) {
         this.languageRepository = languageRepository;
     }
@@ -27,7 +36,9 @@ public class LanguageService {
     }
 
     public List<Language> getAll() {
-        return languageRepository.findAll();
+        List<Language> languages = new ArrayList<>();
+        languageRepository.findAll().forEach(languages::add);
+        return languages;
     }
 
     @Transactional
@@ -36,23 +47,26 @@ public class LanguageService {
     }
 
     public Language findByCode(String code) {
-        return languageRepository.findByCode(code); // Delegate to the repository's findByCode method
+        TypedQuery<Language> query = entityManager.createNamedQuery("Language.findByCode", Language.class);
+        query.setParameter("code", code);
+        List<Language> result = query.getResultList();
+        return result.isEmpty() ? null : result.get(0);
     }
 
     public Language findByName(String name) {
         return languageRepository.findLanguageByName(name);
     }
 
+    @Transactional
     public Language updateLanguage(String code, Language language) {
-        Language existing = languageRepository.findByCode(code);
-        if (existing != null) {
-            existing.setCode(language.getCode().toLowerCase());
-            existing.setName(language.getName());
+        Language existingLanguage = findByCode(code);
 
-            return existing;
+        if (existingLanguage != null) {
+            languageRepository.updateLanguageByCode(code, language.getCode(), language.getName());
+            return new Language(language.getCode(), language.getName());
         }
 
-        return languageRepository.save(language);
+        return null;
     }
 
     public void checkIfLanguagesExist(DictionaryRequest requestDictionary) {
