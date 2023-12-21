@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -167,15 +168,15 @@ public class LanguageController {
             ),
             @ApiResponse(responseCode = "404", description = "Language not found.", content = @Content)
     })
-    public ResponseEntity<Language> deleteLanguage(@PathVariable String code) {
-        Language language = languageService.deleteByCode(code);
-        if (language == null) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteLanguage(@PathVariable String code) {
+        if (languageService.findByCode(code) == null) {
             throw new ResponseStatusException(
                     org.springframework.http.HttpStatus.NOT_FOUND,
                     "Language is not found"
             );
         }
 
-        return ResponseEntity.ok(language);
+        languageService.deleteByCode(code);
     }
 }
